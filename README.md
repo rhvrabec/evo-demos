@@ -1,6 +1,6 @@
 # evo-sensortag-demo
 
-This is an HTML5/JavaScript app demonstrating reading the TI SensorTag, via a server running on e.g. a Raspberry Pi. The Pi connects to the SensorTag using BLE, and serves the app with data. The app can run in a web browser, on mobile or desktop, and can also be packaged as a hybrid native app.
+This is an HTML5/JavaScript app demonstrating reading the TI SensorTag, via a node.js server running on e.g. a Raspberry Pi. The Pi connects to the SensorTag using BLE, and serves the app with data. The app can run in a web browser, on mobile or desktop, and can also be packaged as a hybrid native app.
 
 ## Screenshots
 
