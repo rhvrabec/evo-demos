@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=1">
+    <title>SensorTag Demo</title>
+    <link href="libs/bootstrap-3.0.0/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <script src="libs/jquery/jquery-2.0.3.min.js"></script>
+    <script src="libs/bootstrap-3.0.0/js/bootstrap.min.js"></script>
+    <style>
+    /* TODO: Move to file style.css */
+    html, body
+    {
+		margin: 0px 0px;
+		background-color: rgb(255,255,255);
+	}
+	.UIPage
+	{
+	}
+	.UIHeader 
+	{
+		padding: 0.3em 0 0.3em 0;
+		background-color: rgb(230,0,0);
+		color: rgb(255,255,255);
+		font-size: 2.2em;
+		font-weight: bold;
+		text-align: center;
+	}
+	.UIContent
+	{
+		margin: 2em 2em;
+	}
+	.UIBackButton
+	{
+		position: absolute;
+		left: 0.5em;
+	}
+	.btn-custom 
+	{
+		color: rgb(255, 255, 255);
+		background-color: rgb(230,0,0);
+	    border-color: rgb(172, 41, 37);
+	}
+	.btn-custom:hover, .btn-custom:focus, .btn-custom:active
+	{
+	    color: rgb(255, 255, 255);
+		background-color: rgb(230,80,0);
+	    /*background-color: rgb(210, 50, 45);*/
+	    border-color: rgb(172, 41, 37);
+	}
+	.panel-custom
+	{
+	    border-color: rgb(230,0,0);
+	}
+	.panel-custom > .panel-heading
+	{
+	    color: rgb(255, 255, 255);
+	    background-color: rgb(230,0,0);
+	}
+	.UITemperature
+	{
+		font-size: 1.2em;
+		font-weight: bold;
+	}
+	</style>
+</head>
+<body>
+
+<div id="MainUI" class="UIPage">
+
+	<div class="UIHeader">
+        SensorTag Demo
+    </div>
+
+	<div class="UIContent">
+		<h3>Enter IP-address of the Pi 
+		(e.g. 192.168.0.101)</h3>
+		<p><input id="MainUI_IpAddressField" class="form-control input-lg" value="" type="url" size="30"/></p>
+		<p><button id="MainUI_ConnectButton" type="button" class="btn btn-lg btn-custom" onclick="app.connectToSensorTag()" >Connect to SensorTag</button></p>
+		<h3>Demos</h3>
+		<p><button type="button" class="btn btn-lg btn-custom" onclick="app.openTemperatureDemo()" >Temperature Demo</button></p>
+    </div>
+</div>
+
+<div id="TemperatureDemoUI" class="UIPage">
+	<div class="UIHeader">
+        <button type="button" class="btn btn-lg btn-custom UIBackButton" onclick="app.closeTemperatureDemo()">Back</button> 
+        Temperature Demo
+    </div>
+
+	<div class="UIContent">
+		<div class="panel panel-custom">
+			<div class="panel-heading">
+				<h3 class="panel-title">Object Temperature</h3>
+			</div>
+			<div class="panel-body">
+				<span id="TemperatureDemoUI_ObjectTemperature" class="UITemperature">?</span>
+			</div>
+		</div>
+
+		<div class="panel panel-custom">
+			<div class="panel-heading">
+				<h3 class="panel-title">Ambient Temperature</h3>
+			</div>
+			<div class="panel-body">
+				<span id="TemperatureDemoUI_AmbientTemperature" class="UITemperature">?</span>
+			</div>
+		</div>
+    </div>
+</div>
+
+<script>
+// TODO: Move to file EvoSensorTag.js
+var evo = {}
+evo.SensorTag = {}
+
+evo.SensorTag.discover = function(fun)
+{
+	var mSensorTag = {}
+	var mSocket
+	var mCallbackFunctions = {}
+	var mCallbackCounter = 0
+
+	mSensorTag.connect = function(ip, fun)
+	{
+		// Open socket.io connection.
+		evo.loadSocketIoThenCall(ip, function()
+		{
+			mSocket = io.connect('http://' + ip + ':6277')
+			mSocket.on('connect', function()
+		    {
+		    	console.log('SensorTag connected')
+		    	fun()
+			})        
+			mSocket.on('sensorTag.response', function(data)
+	        {
+	            var fun = mCallbackFunctions[data.callbackId]
+	            if (data.params)
+	            {
+					fun.apply(null, data.params)
+	            }
+	            else
+	            {
+	            	fun()
+	            }
+	            delete mCallbackFunctions[data.callbackId]
+	        })
+		})
+	}
+
+	// Dummy implementation.
+	mSensorTag.enableIrTemperature = function(fun)
+	{
+		fun()
+	}
+
+	// Dummy implementation.
+	mSensorTag.disableIrTemperature = function(fun)
+	{
+		fun()
+	}
+
+	// Dummy implementation.
+	// Callback: fun(objectTemperature, ambientTemperature)
+	mSensorTag.readIrTemperature = function(fun)
+	{
+		sendRequest(fun, 
+		{ 
+			service: 'readIrTemperature'
+		})
+	}
+
+	// Helper function that sends a sensor tag request.
+	// The function fun will be called when request completes.
+	function sendRequest(fun, requestParams)
+	{
+		++mCallbackCounter
+		var id = 'callback' + mCallbackCounter
+		requestParams.callbackId = id
+		mCallbackFunctions[id] = fun
+		mSocket.emit('sensorTag.request', requestParams)
+	}
+
+	// Return sensor tag object to discover callback function.
+	fun(mSensorTag)
+}
+
+// Helper function that loads socket.io.
+evo.loadSocketIoThenCall = function(ip, fun)
+{
+	var script = document.createElement('script')
+	//script.type = 'text/javascript' // Not needed by HTML5
+	script.src = 'http://' + ip + ':6277/socket.io/socket.io.js'
+	script.onload = fun
+	document.body.appendChild(script)
+}
+
+</script>
+
+<script>
+// SensorTag demo.
+var app = {}
+app.ipAddress = ''
+app.sensorTag = null
+
+app.connectToSensorTag = function()
+{
+	evo.SensorTag.discover(function(sensorTag)
+	{
+		app.sensorTag = sensorTag
+		sensorTag.connect(app.getIpAddress(), function()
+		{
+			$('#MainUI_ConnectButton').html('Connected!')
+		})
+	})
+}
+
+app.openTemperatureDemo = function()
+{
+	app.showPage('TemperatureDemoUI')
+	app.sensorTag.enableIrTemperature(function()
+	{
+		app.temperatureDemoIsRunning = true
+		app.temperatureDemoUpdate()
+	})
+}
+
+app.temperatureDemoUpdate = function()
+{
+	app.sensorTag.readIrTemperature(
+		function(objectTemperature, ambientTemperature)
+		{
+			$('#TemperatureDemoUI_ObjectTemperature').html(objectTemperature)
+			$('#TemperatureDemoUI_AmbientTemperature').html(ambientTemperature)
+			
+			if (app.temperatureDemoIsRunning)
+			{
+				setTimeout(app.temperatureDemoUpdate, 1000)
+			}
+		})
+}
+
+app.closeTemperatureDemo = function()
+{
+	app.temperatureDemoIsRunning = false
+	app.showPage('MainUI')
+	app.sensorTag.disableIrTemperature(function() {})
+}
+
+app.showPage = function(pageId)
+{
+	$('.UIPage').hide()
+	$('#' + pageId).show()
+}
+
+// Get and store the value if the IP-address field.
+app.getIpAddress = function()
+{
+    app.ipAddress = $('#MainUI_IpAddressField').val()
+    localStorage.setItem('RecentIpAddress', app.ipAddress)
+    return app.ipAddress
+}
+
+// Retrieve and display the last used IP-address.
+app.setSavedIpAddress = function()
+{
+	var ip = localStorage.getItem('RecentIpAddress')
+	if (ip) 
+	{
+		$('#MainUI_IpAddressField').val(ip)
+	}
+}
+
+// Show main page.
+app.showPage('MainUI')
+
+// Display the last used ip address.
+app.setSavedIpAddress()
+</script>
+</body>
+</html>
