@@ -4,7 +4,9 @@ This is an HTML5/JavaScript app demonstrating reading the TI SensorTag, via a no
 
 ## Screenshots
 
-![](https://raw.github.com/divineprog/evo-sensortag-demo/master/Documentation/ScreenMain.png) ![](https://raw.github.com/divineprog/evo-sensortag-demo/master/Documentation/ScreenMainConnected.png) ![](https://raw.github.com/divineprog/evo-sensortag-demo/master/Documentation/ScreenTemperatureDemo.png)
+![](https://raw.github.com/divineprog/evo-sensortag-demo/master/Documentation/ScreenMain.png)
+![](https://raw.github.com/divineprog/evo-sensortag-demo/master/Documentation/ScreenMainConnected.png)
+![](https://raw.github.com/divineprog/evo-sensortag-demo/master/Documentation/ScreenTemperatureDemo.png)
 
 ## Contact
 
