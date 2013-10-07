@@ -27,7 +27,7 @@ app.main = function()
 	    app.sensor.readIrTemperature(function(ot, at)
         {
              console.log('Temp: ' + ot + ' ' + at)
-             tag.sensor.disconnect(function() { console.log('End') })
+             app.sensor.disconnect(function() { console.log('End') })
         })
     })
 }

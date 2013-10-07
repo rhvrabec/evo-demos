@@ -2,35 +2,69 @@
 
 evo = {}
 
-evo.SOCKETIO = require('socket.io')
+evo.SocketIo = require('socket.io')
+evo.SensorTag = require('sensortag')
 
-evo.IO = evo.SOCKETIO.listen(6277)
-
-evo.IO.sockets.on('connection', function(socket) 
+// Calls the function fun when the SensorTag is connected and enabled.
+evo.connectToSensorTagThenCall = function(fun)
 {
-	console.log('SensorDemo client connected')
-	
-	socket.on('disconnect', function ()
-	{
-		console.log('SensorDemo client disconnected')
+    SensorTag.discover(function(sensor)
+    {
+        console.log('SensorTag discovered')
+        sensor.connect(function()
+        {
+            console.log('SensorTag connected')
+            sensor.discoverServicesAndCharacteristics(function()
+            {
+                console.log('Services discovered')
+                evo.sensor = sensor
+                evo.enableSensors(fun)
+            })
+        })
     })
+}
 
-    socket.on('sensorTag.request', function(data)
-	{
-        console.log('SensorDemo request: ' + data.service)
-        
-		if ('readIrTemperature' == data.service)
-		{
-			// TODO: Add call to actual sensor API.
-			// These are dummy values.
-            var objectTemperature = 20
-            var ambientTemperature = 10
-			evo.IO.sockets.emit('sensorTag.response', 
-			{
-				callbackId: data.callbackId,
-				params: [objectTemperature, ambientTemperature]
-			})
-		}
+evo.enableSensors = function(fun)
+{
+    evo.sensor.enableIrTemperature(function()
+    {
+	    fun()
     })
-})
-                               
+}
+
+evo.startServer = function()
+{
+	evo.IO = evo.SocketIo.listen(6277)
+
+	evo.IO.sockets.on('connection', function(socket) 
+	{
+		console.log('SensorDemo client connected')
+		
+		socket.on('disconnect', function ()
+		{
+			//evo.sensor.disconnect(function() { console.log('SensorTag disconnected') })
+			console.log('SensorDemo client disconnected')
+	    })
+
+	    socket.on('sensorTag.request', function(data)
+		{
+	        console.log('Sensor request: ' + data.service)
+	        
+			if ('readIrTemperature' == data.service)
+			{
+				evo.sensor.readIrTemperature(function(objectTemperature, ambientTemperature)
+		        {
+		            console.log('Temp: ' + objectTemperature + ' ' + ambientTemperature)
+					evo.IO.sockets.emit('sensorTag.response', 
+					{
+						callbackId: data.callbackId,
+						params: [objectTemperature, ambientTemperature]
+					})
+		        })
+			}
+	    })
+	})
+}
+
+// This connects to the sensor tag and starts the server.
+evo.connectToSensorTag(evo.startServer)
