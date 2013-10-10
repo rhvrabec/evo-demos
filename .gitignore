@@ -26,3 +26,6 @@ UI/nw.pak
 
 # Mac files
 .DS_store
+
+# node.js modules
+node_modules

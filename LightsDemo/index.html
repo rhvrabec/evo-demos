@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=1">
+	<title>Lights Demo</title>
+    <link href="libs/bootstrap-3.0.0/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <style>
+    html, body
+    {
+		margin: 20px 20px;
+		background-color: rgb(255,255,255);
+	}
+	div
+	{
+		margin: 10px 0px;
+	}
+	</style>
+</head>
+<body>
+	<h1>Lights Demo</h1>
+	<div>
+		<button type="button" class="btn btn-lg btn-success" onclick="app.lightsOn()">Lights On</button>
+		<button type="button" class="btn btn-lg btn-danger" onclick="app.lightsOff()">Lights Off</button>
+	</div>
+	<div>
+		<button type="button" class="btn btn-lg btn-default" onclick="app.lightsSetColor1()">Color 1</button>
+		<button type="button" class="btn btn-lg btn-default" onclick="app.lightsSetColor2()">Color 2</button>
+		<button type="button" class="btn btn-lg btn-default" onclick="app.lightsSetColor3()">Color 3</button>
+	</div>
+	<div>
+		<button type="button" class="btn btn-lg btn-success" onclick="app.lightsEffectOn()">Color Loop</button>
+		<button type="button" class="btn btn-lg btn-danger" onclick="app.lightsEffectOff()">Solid Color</button>
+	</div>
+    <script src="libs/jquery-2.0.3.js"></script>
+    <script src="libs/bootstrap-3.0.0/js/bootstrap.min.js"></script>
+	<script>
+	var app = {}
+
+	app.ip = '192.168.20.100'
+	app.lightId = 2
+	app.user = 'miki123456'
+
+	app.lightsOn = function()
+	{
+		app.lightSetState(2, {"on":true})
+	}
+
+	app.lightsOff = function()
+	{
+		app.lightSetState(2, {"on":false})
+	}
+
+	app.lightsSetColor1 = function()
+	{
+		app.lightSetState(2, {"sat":250, "bri":25,"hue":1000})
+	}
+
+	app.lightsSetColor2 = function()
+	{
+		app.lightSetState(2, {"sat":250, "bri":25,"hue":10000})
+	}
+
+	app.lightsSetColor3 = function()
+	{
+		app.lightSetState(2, {"sat":250, "bri":25,"hue":2990})
+	}
+
+	app.lightsEffectOn = function()
+	{
+		app.lightSetState(2, {"effect":"colorloop"})
+	}
+
+	app.lightsEffectOff = function()
+	{
+		app.lightSetState(2, {"effect":"none"})
+	}
+
+	app.lightSetState = function(lightId, state)
+	{
+		$.ajax({
+			type: 'PUT',
+			dataType: 'json',
+			url: 'http://' + app.ip +'/api/' + app.user + '/lights/' + lightId + '/state',
+			data: JSON.stringify(state),
+			success: function(data) { },
+			error: function(a, err) { }
+		})
+	}
+	
+	/*
+	app.scan = function(baseIpAddress, subnetAddress, success, fail)
+	{
+		if (subnetAddress > 255) { fail() }
+		$.ajax({
+			type: 'GET',
+			dataType: 'json',
+			url: 'http://' + baseIpAddress + '.' subnetAddress '/dummy',
+			success: function(data) { top.hyper.log(data) },
+			error: function(ajax, error) { app.scan(baseIpAddress, 1 + subnetAddress, success, fail) },
+		})
+	}
+
+	myscan = function(baseIpAddress, subnetAddress, success, fail)
+	{
+		if (subnetAddress >= 255) { fail(); return }
+        top.hyper.log('request: ' + subnetAddress)
+		$.ajax({
+            timeout: 100,
+			type: 'GET',
+			dataType: 'json',
+			url: 'http://' + baseIpAddress + '.' + subnetAddress + '/api',
+            success: function(data) { top.hyper.log(
+                'success: ' + JSON.stringify(data)) },
+			error: function(ajax, error) { 
+                top.hyper.log('error: ' + error)
+                myscan(baseIpAddress, 1 + subnetAddress, success, fail) }
+		})
+	}
+    
+    myscan('192.168.20', 80, 
+           function() {}, 
+           function() { top.hyper.log('could not find hue center') })
+    */
+	</script>
+</body>
+</html>
