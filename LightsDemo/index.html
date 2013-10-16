@@ -20,60 +20,142 @@
 <body>
 	<h1>Lights Demo</h1>
 	<div>
-		<button type="button" class="btn btn-lg btn-success" onclick="app.lightsOn()">Lights On</button>
-		<button type="button" class="btn btn-lg btn-danger" onclick="app.lightsOff()">Lights Off</button>
+		<p>Press the button on the Hue bridge, then Connect.</p>
+		<button id="connectButton" type="button" class="btn btn-lg btn-success" 
+			onclick="app.connect()">Connect</button>
+	</div>
+	
+	<div class="btn-group" data-toggle="buttons">
+		<label id="lightButton1" class="btn btn-lg btn-primary"
+			onclick="app.selectLight(1)">
+			<input type="radio"/>Light 1
+		</label>
+		<label id="lightButton2" class="btn btn-lg btn-primary"
+			onclick="app.selectLight(2)">
+			<input type="radio"/>Light 2
+		</label>
+		<label id="lightButton3" class="btn btn-lg btn-primary"
+			onclick="app.selectLight(3)">
+			<input type="radio"/>Light 3
+		</label>
+	</div>
+	
+	<div>
+		<button type="button" class="btn btn-lg btn-success" 
+			onclick="app.lightsOn()">Lights On</button>
+		<button type="button" class="btn btn-lg btn-danger" 
+			onclick="app.lightsOff()">Lights Off</button>
+	</div>
+	
+	<div>
+		<button type="button" class="btn btn-lg btn-primary" 
+			onclick="app.lightsSetColor1()">Color 1</button>
+		<button type="button" class="btn btn-lg btn-primary" 
+			onclick="app.lightsSetColor2()">Color 2</button>
+		<button type="button" class="btn btn-lg btn-primary" 
+			onclick="app.lightsSetColor3()">Color 3</button>
 	</div>
 	<div>
-		<button type="button" class="btn btn-lg btn-default" onclick="app.lightsSetColor1()">Color 1</button>
-		<button type="button" class="btn btn-lg btn-default" onclick="app.lightsSetColor2()">Color 2</button>
-		<button type="button" class="btn btn-lg btn-default" onclick="app.lightsSetColor3()">Color 3</button>
+		<button type="button" class="btn btn-lg btn-success"
+			 onclick="app.lightsEffectOn()">Color Loop</button>
+		<button type="button" class="btn btn-lg btn-danger" 
+			onclick="app.lightsEffectOff()">Solid Color</button>
 	</div>
-	<div>
-		<button type="button" class="btn btn-lg btn-success" onclick="app.lightsEffectOn()">Color Loop</button>
-		<button type="button" class="btn btn-lg btn-danger" onclick="app.lightsEffectOff()">Solid Color</button>
-	</div>
+	
     <script src="libs/jquery-2.0.3.js"></script>
     <script src="libs/bootstrap-3.0.0/js/bootstrap.min.js"></script>
 	<script>
 	var app = {}
 
-	app.ip = '192.168.20.100'
-	app.lightId = 2
+	// NOTE: Change this address to the ip-address of the Hue Bridge.
+	// Look it up using: ping 255.255.255.255 followed by: arp -a
+	// Then try to figure the ip :)
+	app.hueBridgeIpAddress = '192.168.20.100'
+	
 	app.user = 'miki123456'
 
+	app.lightId = 1
+	// Indicate the selected default light.
+	$('#lightButton' + app.lightId).button('toggle')
+	
+	app.connect = function()
+	{
+		$('#connectButton').html('Connecting...') 
+		app.registerUser(
+			app.user,
+			function(json)
+			{
+				if (json[0].error) 
+				{
+					$('#connectButton').html('Could not connect')
+				}
+				else if (json[0].success) 
+				{ 
+					$('#connectButton').html('Connected') 
+				}
+				else
+				{ 
+					$('#connectButton').html('Something went wrong') 
+				}
+			},
+			function()
+			{
+				$('#connectButton').html('Could not find Hue Bridge')
+			})
+	}
+	
+	app.registerUser = function(userName, successFun, failFun)
+	{
+		var data = {"devicetype":"test user","username":userName}
+		$.ajax({
+			type: 'POST',
+			dataType: 'json',
+            timeout: 3000,
+			url: 'http://' + app.hueBridgeIpAddress +'/api/',
+			data: JSON.stringify(data),
+			success: function(data) { successFun(data) },
+			error: function(a, err) { failFun(err) }
+		})
+	}
+
+	app.selectLight = function(lightId)
+	{
+		app.lightId = lightId
+	}
+	
 	app.lightsOn = function()
 	{
-		app.lightSetState(2, {"on":true})
+		app.lightSetState(app.lightId, {"on":true})
 	}
 
 	app.lightsOff = function()
 	{
-		app.lightSetState(2, {"on":false})
+		app.lightSetState(app.lightId, {"on":false})
 	}
 
 	app.lightsSetColor1 = function()
 	{
-		app.lightSetState(2, {"sat":250, "bri":25,"hue":1000})
+		app.lightSetState(app.lightId, {"sat":250, "bri":25,"hue":1000})
 	}
 
 	app.lightsSetColor2 = function()
 	{
-		app.lightSetState(2, {"sat":250, "bri":25,"hue":10000})
+		app.lightSetState(app.lightId, {"sat":250, "bri":25,"hue":10000})
 	}
 
 	app.lightsSetColor3 = function()
 	{
-		app.lightSetState(2, {"sat":250, "bri":25,"hue":2990})
+		app.lightSetState(app.lightId, {"sat":250, "bri":25,"hue":2990})
 	}
 
 	app.lightsEffectOn = function()
 	{
-		app.lightSetState(2, {"effect":"colorloop"})
+		app.lightSetState(app.lightId, {"effect":"colorloop"})
 	}
 
 	app.lightsEffectOff = function()
 	{
-		app.lightSetState(2, {"effect":"none"})
+		app.lightSetState(app.lightId, {"effect":"none"})
 	}
 
 	app.lightSetState = function(lightId, state)
@@ -81,47 +163,13 @@
 		$.ajax({
 			type: 'PUT',
 			dataType: 'json',
-			url: 'http://' + app.ip +'/api/' + app.user + '/lights/' + lightId + '/state',
+			url: 'http://' + app.hueBridgeIpAddress +'/api/' + 
+				app.user + '/lights/' + lightId + '/state',
 			data: JSON.stringify(state),
 			success: function(data) { },
 			error: function(a, err) { }
 		})
 	}
-	
-	/*
-	app.scan = function(baseIpAddress, subnetAddress, success, fail)
-	{
-		if (subnetAddress > 255) { fail() }
-		$.ajax({
-			type: 'GET',
-			dataType: 'json',
-			url: 'http://' + baseIpAddress + '.' subnetAddress '/dummy',
-			success: function(data) { top.hyper.log(data) },
-			error: function(ajax, error) { app.scan(baseIpAddress, 1 + subnetAddress, success, fail) },
-		})
-	}
-
-	myscan = function(baseIpAddress, subnetAddress, success, fail)
-	{
-		if (subnetAddress >= 255) { fail(); return }
-        top.hyper.log('request: ' + subnetAddress)
-		$.ajax({
-            timeout: 100,
-			type: 'GET',
-			dataType: 'json',
-			url: 'http://' + baseIpAddress + '.' + subnetAddress + '/api',
-            success: function(data) { top.hyper.log(
-                'success: ' + JSON.stringify(data)) },
-			error: function(ajax, error) { 
-                top.hyper.log('error: ' + error)
-                myscan(baseIpAddress, 1 + subnetAddress, success, fail) }
-		})
-	}
-    
-    myscan('192.168.20', 80, 
-           function() {}, 
-           function() { top.hyper.log('could not find hue center') })
-    */
 	</script>
 </body>
 </html>
