@@ -1,4 +1,4 @@
-# Magic Stone - Make Apps for the TI SensorTag in JavaScript
+# Magic Stone - Make mobile apps for the TI SensorTag in JavaScript
 
 Mikael Kindborg, Evothings AB
 
@@ -8,7 +8,7 @@ The [Texas Instruments TI SensorTag](http://www.ti.com/ww/en/wireless_connectivi
 
 Here is a photo of the TI SensorTag:
 
-![TI SensorTag](TISensorTag.png)
+![TI SensorTag](TISensorTag600x400.png)
 
 ## Magic Stone demo app
 
@@ -16,7 +16,7 @@ Magic Stone is a demo app that showcases the TI SensorTag. Coded in JavaScript, 
 
 This is what the app looks like:
 
-![Magic Stone](MagicStoneScreenshot.jpg)
+![Magic Stone screenshot](MagicStoneScreenshot600x340.jpg)
 
 [Watch a video of the app in action](http://www.youtube.com/watch?v=Cxd0OS1FNsc) - revealing the hidden TI SensorTag :)
 
