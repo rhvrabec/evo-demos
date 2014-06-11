@@ -47,7 +47,7 @@ Files of interest:
 * [easy-ble.js](https://github.com/divineprog/evo-demos/blob/master/Demos2014/MagicStone/easy-ble.js) is a high-level abstraction of the API in ble.js.
 * [sensortag.js](https://github.com/divineprog/evo-demos/blob/master/Demos2014/MagicStone/sensortag.js) is a high-level library for the TI SensorTag. The only sensor implemented at the moment is the accelerometer. It is easy to add more sensors, and this is something I am planning to do.
 
-The documentation for the UUIDs used by SensorTag services and characteristics is found here: [SensorTag_User_Guide](http://processors.wiki.ti.com/index.php/SensorTag_User_Guide)
+The documentation for the UUIDs used by SensorTag services and characteristics is found here: [SensorTag_User_Guide](http://processors.wiki.ti.com/index.php/SensorTag_User_Guide),
 [BLE_SensorTag_GATT_Server.pdf](http://processors.wiki.ti.com/index.php/File:BLE_SensorTag_GATT_Server.pdf).
 
 ## Building a native app
