@@ -1,3 +1,9 @@
+/**
+ * File: sprite.js
+ * Description: Simple DOM-based sprite utility.
+ * Author: Miki
+ */
+
 var spritemaker = function()
 {
 	var sprite = {}

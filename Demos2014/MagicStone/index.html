@@ -11,6 +11,9 @@
 	<title>MagicStone</title>
 	<link rel="stylesheet" href="common.css" />
 	<style>
+	body {
+		background: rgb(255,255,255);
+	}
 	#stone {
 		position: absolute;
 		width: 200px;
@@ -44,7 +47,7 @@
 	{
 		// Connect to the SensorTag.
 		sensortag.connect(
-			['f000aa10-0451-4000-b000-000000000000'], // Accelerometer service UUID.
+			[sensortag.ACCELEROMETER_UUID],
 			function()
 			{
 				// Display stone.
@@ -61,7 +64,6 @@
 						console.log('Accelerometer error: ' + error)
 					})
 			},
-
 			function(error)
 			{
 				console.log('Connect error: ' + error)
@@ -75,13 +77,13 @@
 
 	function moveStone(data)
 	{
-		var dataArray = new Int8Array(data);
-		//console.log('byteLength: '+data.byteLength);
-		//console.log('length: '+dataArray.length);
-		//console.log('data: '+dataArray[0]+' '+dataArray[1]+' '+dataArray[2]);
+		var dataArray = new Int8Array(data)
+		//console.log('byteLength: ' + data.byteLength)
+		//console.log('length: ' + dataArray.length)
+		//console.log('data: ' + dataArray[0] + ' ' + dataArray[1] + ' ' + dataArray[2])
 
-		var dx = dataArray[0];
-		var dy = dataArray[1];
+		var dx = dataArray[0] * 2
+		var dy = dataArray[1] * 2
 
 		var x = stone.getCenterX() + dx
 		var y = stone.getCenterY() - dy

@@ -1,10 +1,18 @@
-/*
-Starting point for a JavaScript TI SensorTag library.
-*/
+/**
+ * File: sensortag.js
+ * Description: Starting point for a JavaScript TI SensorTag library.
+ * Author: Miki
+ */
 
 var sensortag = (function()
 {
 	var sensortag = {}
+
+	sensortag.ACCELEROMETER_UUID = 'f000aa10-0451-4000-b000-000000000000'
+
+	// TODO: Add UUIDs for other sensor services. Documentation:
+	// http://processors.wiki.ti.com/index.php/SensorTag_User_Guide
+	// http://processors.wiki.ti.com/index.php/File:BLE_SensorTag_GATT_Server.pdf
 
 	sensortag.device = null
 
@@ -29,14 +37,14 @@ var sensortag = (function()
 	 */
 	sensortag.connect = function(services, win, fail)
 	{
-		console.log('scanning')
+		console.log('Scanning...')
 		sensortag.disconnect()
 		easyble.stopScan()
 		easyble.reportDeviceOnce = false
 		easyble.startScan(
 			function(device)
 			{
-				console.log('device found: ' + device.name + ' rssi: ' + device.rssi)
+				console.log('Device found: ' + device.name + ' rssi: ' + device.rssi)
 
 				// Connect if we have found a sensor tag.
 				if (sensortag.deviceIsSensorTag(device) &&
@@ -130,6 +138,8 @@ var sensortag = (function()
 			win,
 			fail)
 	}
+
+	// TODO: Add On/Off functions for other sensors.
 
 	return sensortag
 })()
