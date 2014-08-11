@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, user-scalable=no
+		initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+
+	<title>Relaxing Places</title>
+
+	<style>
+	html, body
+	{
+		margin: 0px;
+		padding: 0px;
+	}
+
+	iframe
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		bottom: 0px;
+		right: 0px;
+		width: 100%;
+		height: 100%;
+		border: none;
+		margin: 0px;
+		padding: 0px;
+		/*overflow: scroll;*/
+	}
+	</style>
+
+	<script>
+	// Redirect console to Evothings Workbench.
+	if (window.hyper) { console.log = hyper.log; }
+	</script>
+</head>
+
+<body>
+	<iframe scrolling="auto" src="page-default.html"></iframe>
+	<script src="lib/jquery.js"></script>
+	<script src="cordova.js"></script>
+	<script src="app.js"></script>
+</body>
+
+</html>
