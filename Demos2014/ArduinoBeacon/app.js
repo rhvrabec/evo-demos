@@ -6,7 +6,7 @@ var app = {}
 app.beaconPages = {
 	'BEACON1':'page-feet.html',
 	'BEACON2':'page-shoulders.html',
-	'BEACON3':'page-head.html'F
+	'BEACON3':'page-face.html'
 }
 
 // Signal strength of beacons.
@@ -42,9 +42,10 @@ app.startScan = function()
 // @param deviceInfo - Object with fields: address, rssi, name
 app.deviceFound = function(deviceInfo)
 {
-	// Is this a beacon?
-	var page = app.beaconPages[deviceInfo.name]
-	if (page)
+	// Have we found one of our beacons?
+	// Sometimes the RSSI is 127, which is a buggy value,
+	// we filter this out here.
+	if (app.beaconPages[deviceInfo.name] && deviceInfo.rssi < 0)
 	{
 		// Update signal strength for beacon.
 		app.beaconRSSI[deviceInfo.name] = deviceInfo.rssi
@@ -75,7 +76,7 @@ app.monitorClosestBeacon = function()
 			// First beacon found.
 			closestBeacon = beaconName
 		}
-		else if (app.beaconRSSI[beaconName] > app.beaconRSSI[strogestBeacon])
+		else if (app.beaconRSSI[beaconName] > app.beaconRSSI[closestBeacon])
 		{
 			// Found stronger beacon.
 			closestBeacon = beaconName
@@ -90,15 +91,15 @@ app.monitorClosestBeacon = function()
 
 		// Get the page to display.
 		var page = app.beaconPages[app.currentBeacon]
-hyper.log('showing page: ' + page)
+
 		// Show the page.
-		window.frames[0].location.assign(page)
+		window.frames[0].location.replace(page)
 	}
 
 	// Refresh RSSI table.
 	app.beaconRSSI = {}
 
-	// Monitor again after time interval.
+	// Monitor again after a time interval.
 	setTimeout(function() { app.monitorClosestBeacon() }, 2000)
 }
 
