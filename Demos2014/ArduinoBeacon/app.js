@@ -6,7 +6,7 @@ var app = {}
 app.beaconPages = {
 	'BEACON1':'page-feet.html',
 	'BEACON2':'page-shoulders.html',
-	'BEACON3':'page-head.html'
+	'BEACON3':'page-head.html'F
 }
 
 // Signal strength of beacons.
@@ -56,7 +56,7 @@ app.deviceFound = function(deviceInfo)
 app.scanError = function(errorCode)
 {
 	// Report error.
-	alert('Beacon Scan Error: ' + errorCode);
+	alert('Beacon Scan Error: ' + errorCode)
 }
 
 
