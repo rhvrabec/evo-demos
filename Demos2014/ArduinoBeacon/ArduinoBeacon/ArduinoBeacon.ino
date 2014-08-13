@@ -28,7 +28,6 @@ void setup()
 // This function is called continuously, after setup() completes.
 void loop()
 {
-
     // Process BLE events.
     ble_do_events();
 }
