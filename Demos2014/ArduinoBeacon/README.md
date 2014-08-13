@@ -1,4 +1,4 @@
-DIY Arduino Beacons
+<h1>DIY Arduino Beacons</h1>
 
 This example is a mobile app for Android and iOS that uses an Arduino board as a beacon. This is like a Do-It-Yourself version of Apple's <a href="http://en.wikipedia.org/wiki/IBeacon">iBeacon</a> technology. Under the hood, an iBeacon is just a small BLE (Bluetooth Low Energy) device that advertises a specific UUID (Universally Unique Identifier). If we put an BLE shield on an Arduino, we have all that we need to do something similar. Arduino compatible boards with built in BLE also work fine, such as the <a href="http://redbearlab.com/">RedBearLab Blend Micro</a> board or the <a href="http://punchthrough.com/bean/">LightBlue Bean</a>.
 
