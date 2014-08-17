@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<!--
+	Demonstration of the TI SensorTag JavaScript library.
+-->
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>TI SensorTag Demo</title>
+	<link rel="stylesheet" href="common.css" />
+	<style>
+	body {
+		background: rgb(255,255,255);
+	}
+	</style>
+	<script>
+	// Redirect console.log to Evothings Workbench.
+	if (window.hyper) { console.log = hyper.log; }
+	</script>
+	<script src="cordova.js"></script>
+	<script src="easy-ble.js"></script>
+	<script src="ti-sensortag.js"></script>
+</head>
+<body>
+	<h1>TI SensorTag Demo</h1>
+
+	<h2 id="AccelerometerData">Accelerometer: [Waiting for value]</h2>
+	<h2 id="MagnetometerData">Magnetometer: [Waiting for value]</h2>
+
+	<script>
+	function initialiseSensortag()
+	{
+		var sensorTag = TISensorTag.createInstance()
+		sensorTag
+			.accelerometerCallback(accelerometerHandler, 100)
+			.magnetometerCallback(magnetometerHandler, 100)
+			.connectToClosestDevice()
+	}
+
+	function accelerometerHandler(data)
+	{
+		var dataArray = new Int8Array(data)
+		//console.log('byteLength: ' + data.byteLength)
+		//console.log('length: ' + dataArray.length)
+		//console.log('acceldata: ' + dataArray[0] + ' ' + dataArray[1] + ' ' + dataArray[2])
+
+		var x = dataArray[0]
+		var y = dataArray[1]
+		var z = dataArray[2]
+
+		document
+			.getElementById('AccelerometerData')
+				.innerHTML = 'Accelerometer: ' + x + ',' + y + ',' + z
+	}
+
+	function magnetometerHandler(data)
+	{
+		var dataArray = new Int8Array(data)
+
+		var x = dataArray[0]
+		var y = dataArray[1]
+		var z = dataArray[2]
+
+		document
+			.getElementById('MagnetometerData')
+				.innerHTML = 'Magnetometer: ' + x + ',' + y + ',' + z
+	}
+
+	document.addEventListener('deviceready', initialiseSensortag, false)
+	</script>
+</body>
+</html>
