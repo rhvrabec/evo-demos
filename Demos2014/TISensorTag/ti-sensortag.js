@@ -8,8 +8,30 @@ var TISensorTag = (function()
 {
 	var sensortag = {}
 
-	sensortag.ACCELEROMETER_UUID = 'f000aa10-0451-4000-b000-000000000000'
-	sensortag.MAGNETOMETER_UUID = 'f000aa30-0451-4000-b000-000000000000'
+	sensortag.IRTEMPERATURE_SERVICE = 'f000aa00-0451-4000-b000-000000000000'
+	sensortag.IRTEMPERATURE_CONFIG = 'f000aa02-0451-4000-b000-000000000000'
+	sensortag.IRTEMPERATURE_PERIOD = 'f000aa03-0451-4000-b000-000000000000'
+	sensortag.IRTEMPERATURE_DATA = 'f000aa01-0451-4000-b000-000000000000'
+	sensortag.IRTEMPERATURE_NOTIFICATION = '00002901-0000-1000-8000-00805f9b34fb'
+
+	sensortag.ACCELEROMETER_SERVICE = 'f000aa10-0451-4000-b000-000000000000'
+	sensortag.ACCELEROMETER_CONFIG = 'f000aa12-0451-4000-b000-000000000000'
+	sensortag.ACCELEROMETER_PERIOD = 'f000aa13-0451-4000-b000-000000000000'
+	sensortag.ACCELEROMETER_DATA = 'f000aa11-0451-4000-b000-000000000000'
+	sensortag.ACCELEROMETER_NOTIFICATION = '00002902-0000-1000-8000-00805f9b34fb'
+
+	sensortag.HUMIDITY_SERVICE = 'f000aa20-0451-4000-b000-000000000000'
+	sensortag.HUMIDITY_CONFIG = 'f000aa22-0451-4000-b000-000000000000'
+	sensortag.HUMIDITY_PERIOD = 'f000aa23-0451-4000-b000-000000000000'
+	sensortag.HUMIDITY_DATA = 'f000aa21-0451-4000-b000-000000000000'
+	sensortag.HUMIDITY_NOTIFICATION = '00002901-0000-1000-8000-00805f9b34fb'
+
+	sensortag.MAGNETOMETER_SERVICE = 'f000aa30-0451-4000-b000-000000000000'
+	sensortag.MAGNETOMETER_CONFIG = 'f000aa32-0451-4000-b000-000000000000'
+	sensortag.MAGNETOMETER_PERIOD = 'f000aa33-0451-4000-b000-000000000000'
+	sensortag.MAGNETOMETER_DATA = 'f000aa31-0451-4000-b000-000000000000'
+	sensortag.MAGNETOMETER_NOTIFICATION = '00002902-0000-1000-8000-00805f9b34fb'
+
 
 	// TODO: Add UUIDs for other sensor services. Documentation:
 	// http://processors.wiki.ti.com/index.php/SensorTag_User_Guide
@@ -58,7 +80,7 @@ var TISensorTag = (function()
 		{
 			instance.accelerometerFun = fun
 			instance.accelerometerInterval = interval
-			instance.requiredServices.push(sensortag.ACCELEROMETER_UUID)
+			instance.requiredServices.push(sensortag.ACCELEROMETER_SERVICE)
 
 			return instance
 		}
@@ -72,7 +94,7 @@ var TISensorTag = (function()
 		{
 			instance.magnetometerFun = fun
 			instance.magnetometerInterval = interval
-			instance.requiredServices.push(sensortag.MAGNETOMETER_UUID)
+			instance.requiredServices.push(sensortag.MAGNETOMETER_SERVICE)
 
 			return instance
 		}
@@ -180,35 +202,12 @@ var TISensorTag = (function()
 		 */
 		instance.accelerometerOn = function()
 		{
-			if (!instance.accelerometerFun) { return }
-
-			// Set accelerometer configuration to ON.
-			instance.device.writeCharacteristic(
-				'f000aa12-0451-4000-b000-000000000000',
-				new Uint8Array([1]),
-				function() {},
-				instance.errorFun)
-
-			// Set accelerometer update period.
-			instance.device.writeCharacteristic(
-				'f000aa13-0451-4000-b000-000000000000',
-				new Uint8Array([instance.accelerometerInterval / 10]),
-				function() {},
-				instance.errorFun)
-
-			// Set accelerometer notification to ON.
-			instance.device.writeDescriptor(
-				'f000aa11-0451-4000-b000-000000000000', // Characteristic for accelerometer data
-				'00002902-0000-1000-8000-00805f9b34fb', // Configuration descriptor
-				new Uint8Array([1,0]),
-				function() {},
-				instance.errorFun)
-
-			// Start accelerometer notification.
-			instance.device.enableNotification(
-				'f000aa11-0451-4000-b000-000000000000',
-				instance.accelerometerFun,
-				instance.errorFun)
+			instance.sensorOn(
+				sensortag.ACCELEROMETER_CONFIG,
+				sensortag.ACCELEROMETER_PERIOD,
+				instance.accelerometerInterval,
+				sensortag.ACCELEROMETER_DATA,
+				instance.accelerometerFun)
 
 			return instance
 		}
@@ -218,10 +217,7 @@ var TISensorTag = (function()
 		 */
 		instance.accelerometerOff = function()
 		{
-			instance.device.disableNotification(
-				'f000aa11-0451-4000-b000-000000000000',
-				function() {},
-				instance.errorFun)
+			instance.sensorOff(sensortag.ACCELEROMETER_DATA)
 
 			return instance
 		}
@@ -231,35 +227,12 @@ var TISensorTag = (function()
 		 */
 		instance.magnetometerOn = function()
 		{
-			if (!instance.magnetometerFun) { return }
-
-			// Set magnetometer configuration to ON.
-			instance.device.writeCharacteristic(
-				'f000aa32-0451-4000-b000-000000000000',
-				new Uint8Array([1]),
-				function() {},
-				instance.errorFun)
-
-			// Set magnetometer update period.
-			instance.device.writeCharacteristic(
-				'f000aa33-0451-4000-b000-000000000000',
-				new Uint8Array([instance.magnetometerInterval / 10]),
-				function() {},
-				instance.errorFun)
-
-			// Set magnetometer notification to ON.
-			instance.device.writeDescriptor(
-				'f000aa31-0451-4000-b000-000000000000', // Characteristic for magnetometer data
-				'00002902-0000-1000-8000-00805f9b34fb', // Configuration descriptor
-				new Uint8Array([1,0]),
-				function() {},
-				instance.errorFun)
-
-			// Start magnetometer notification.
-			instance.device.enableNotification(
-				'f000aa31-0451-4000-b000-000000000000',
-				instance.magnetometerFun,
-				instance.errorFun)
+			instance.sensorOn(
+				sensortag.MAGNETOMETER_CONFIG,
+				sensortag.MAGNETOMETER_PERIOD,
+				instance.magnetometerInterval,
+				sensortag.MAGNETOMETER_DATA,
+				instance.magnetometerFun)
 
 			return instance
 		}
@@ -269,18 +242,75 @@ var TISensorTag = (function()
 		 */
 		instance.magnetometerOff = function()
 		{
-			instance.device.disableNotification(
-				'f000aa11-0451-4000-b000-000000000000',
-				function() {},
-				instance.errorFun)
+			instance.sensorOff(sensortag.MAGNETOMETER_DATA)
 
 			return instance
 		}
 
 		// TODO: Add On/Off functions for other sensors.
 
+		/**
+		 * Helper function for turning on sensor notification.
+		 */
+		instance.sensorOn = function(
+			configUUID,
+			periodUUID,
+			periodValue,
+			dataUUID,
+			notificationUUID,
+			notificationFunction)
+		{
+			// Only start sensor if a notification function has been set.
+			if (!notificationFunction) { return }
+
+			// Set sensor configuration to ON.
+			instance.device.writeCharacteristic(
+				configUUID,
+				new Uint8Array([1]),
+				function() {},
+				instance.errorFun)
+
+			// Set sensor update period.
+			instance.device.writeCharacteristic(
+				periodUUID,
+				new Uint8Array([periodValue / 10]),
+				function() {},
+				instance.errorFun)
+
+			// Set sensor notification to ON.
+			instance.device.writeDescriptor(
+				dataUUID, // Characteristic for data
+				notificationUUID, // Configuration descriptor
+				new Uint8Array([1,0]),
+				function() {},
+				instance.errorFun)
+
+			// Start sensor notification.
+			instance.device.enableNotification(
+				dataUUID,
+				notificationFunction,
+				instance.errorFun)
+
+			return instance
+		}
+
+		/**
+		 * Helper function for turning off sensor notification.
+		 */
+		instance.sensorOff = function(dataUUID)
+		{
+			instance.device.disableNotification(
+				dataUUID,
+				function() {},
+				instance.errorFun)
+
+			return instance
+		}
+
+		// Finally, return the SensorTag instance object.
 		return instance
 	}
 
+	// Return the SensorTag 'class' object.
 	return sensortag
 })()
