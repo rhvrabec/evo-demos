@@ -7,9 +7,9 @@ The mobile app used in this tutorial is meant for use in a place where we want t
 
 When approaching a beacon, the app will display a page that suggests a method for relaxation. The beacon itself (the Arduino board) could be used just as it is, or be placed inside some object that signify the existence of a beacon, or be visually hidden.
 
-Screenshots from the app:
+Screenshot from the app:
 
-<img style="width:150px;height:auto;margin-right:5px;" src="http://evomedia.evothings.com/2014/08/relaxing-places-screen1.png" alt="relaxing-places-screen1" /><img style="width:150px;height:auto;margin-right:5px;" src="http://evomedia.evothings.com/2014/08/relaxing-places-screen2.png" alt="relaxing-places-screen2" /><img style="width:150px;height:auto;margin-right:5px;" src="http://evomedia.evothings.com/2014/08/relaxing-places-screen3.png" alt="relaxing-places-screen3" /><img style="width:150px;height:auto;margin-right:5px;" src="http://evomedia.evothings.com/2014/08/relaxing-places-screen4.png" alt="relaxing-places-screen4" />
+<img style="width:150px;height:auto;margin-right:5px;" src="http://evomedia.evothings.com/2014/08/relaxing-places-screen1.png" alt="relaxing-places-screen1" />
 
 There could be as many beacons as you would want, in this example we will use three beacons.
 
