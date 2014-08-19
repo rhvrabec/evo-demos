@@ -4,15 +4,18 @@
  * Author: Miki
  */
 
+// Documentation for the TI SensorTag:
+// http://processors.wiki.ti.com/index.php/SensorTag_User_Guide
+// http://processors.wiki.ti.com/index.php/File:BLE_SensorTag_GATT_Server.pdf
+
 var TISensorTag = (function()
 {
 	var sensortag = {}
 
 	sensortag.IRTEMPERATURE_SERVICE = 'f000aa00-0451-4000-b000-000000000000'
 	sensortag.IRTEMPERATURE_CONFIG = 'f000aa02-0451-4000-b000-000000000000'
-	sensortag.IRTEMPERATURE_PERIOD = 'f000aa03-0451-4000-b000-000000000000'
 	sensortag.IRTEMPERATURE_DATA = 'f000aa01-0451-4000-b000-000000000000'
-	sensortag.IRTEMPERATURE_NOTIFICATION = '00002901-0000-1000-8000-00805f9b34fb'
+	sensortag.IRTEMPERATURE_NOTIFICATION = '00002902-0000-1000-8000-00805f9b34fb'
 
 	sensortag.ACCELEROMETER_SERVICE = 'f000aa10-0451-4000-b000-000000000000'
 	sensortag.ACCELEROMETER_CONFIG = 'f000aa12-0451-4000-b000-000000000000'
@@ -22,9 +25,8 @@ var TISensorTag = (function()
 
 	sensortag.HUMIDITY_SERVICE = 'f000aa20-0451-4000-b000-000000000000'
 	sensortag.HUMIDITY_CONFIG = 'f000aa22-0451-4000-b000-000000000000'
-	sensortag.HUMIDITY_PERIOD = 'f000aa23-0451-4000-b000-000000000000'
 	sensortag.HUMIDITY_DATA = 'f000aa21-0451-4000-b000-000000000000'
-	sensortag.HUMIDITY_NOTIFICATION = '00002901-0000-1000-8000-00805f9b34fb'
+	sensortag.HUMIDITY_NOTIFICATION = '00002902-0000-1000-8000-00805f9b34fb'
 
 	sensortag.MAGNETOMETER_SERVICE = 'f000aa30-0451-4000-b000-000000000000'
 	sensortag.MAGNETOMETER_CONFIG = 'f000aa32-0451-4000-b000-000000000000'
@@ -32,10 +34,19 @@ var TISensorTag = (function()
 	sensortag.MAGNETOMETER_DATA = 'f000aa31-0451-4000-b000-000000000000'
 	sensortag.MAGNETOMETER_NOTIFICATION = '00002902-0000-1000-8000-00805f9b34fb'
 
+	sensortag.BAROMETER_SERVICE = 'f000aa40-0451-4000-b000-000000000000'
+	sensortag.BAROMETER_CONFIG = 'f000aa42-0451-4000-b000-000000000000'
+	sensortag.BAROMETER_DATA = 'f000aa41-0451-4000-b000-000000000000'
+	sensortag.BAROMETER_NOTIFICATION = '00002902-0000-1000-8000-00805f9b34fb'
 
-	// TODO: Add UUIDs for other sensor services. Documentation:
-	// http://processors.wiki.ti.com/index.php/SensorTag_User_Guide
-	// http://processors.wiki.ti.com/index.php/File:BLE_SensorTag_GATT_Server.pdf
+	sensortag.GYROSCOPE_SERVICE = 'f000aa50-0451-4000-b000-000000000000'
+	sensortag.GYROSCOPE_CONFIG = 'f000aa52-0451-4000-b000-000000000000'
+	// Not working: sensortag.GYROSCOPE_PERIOD = 'f000aa53-0451-4000-b000-000000000000'
+	sensortag.GYROSCOPE_DATA = 'f000aa51-0451-4000-b000-000000000000'
+	sensortag.GYROSCOPE_NOTIFICATION = '00002902-0000-1000-8000-00805f9b34fb'
+
+	sensortag.KEYPRESS_SERVICE = '0000ffe0-0000-1000-8000-00805f9b34fb'
+	sensortag.KEYPRESS_DATA = '0000ffe1-0000-1000-8000-00805f9b34fb'
 
 	/**
 	 * Internal. Override if needed.
@@ -72,6 +83,19 @@ var TISensorTag = (function()
 		}
 
 		/**
+		 * Public. Set the IR temperature notification callback.
+		 * @param fun - success callback called repeatedly: fun(data)
+		 * @param interval - accelerometer rate in milliseconds.
+		 */
+		instance.irTemperatureCallback = function(fun)
+		{
+			instance.irTemperatureFun = fun
+			instance.requiredServices.push(sensortag.IRTEMPERATURE_SERVICE)
+
+			return instance
+		}
+
+		/**
 		 * Public. Set the accelerometer notification callback.
 		 * @param fun - success callback called repeatedly: fun(data)
 		 * @param interval - accelerometer rate in milliseconds.
@@ -86,6 +110,19 @@ var TISensorTag = (function()
 		}
 
 		/**
+		 * Public. Set the humidity notification callback.
+		 * @param fun - success callback called repeatedly: fun(data)
+		 * @param interval - accelerometer rate in milliseconds.
+		 */
+		instance.humidityCallback = function(fun)
+		{
+			instance.humidityFun = fun
+			instance.requiredServices.push(sensortag.HUMIDITY_SERVICE)
+
+			return instance
+		}
+
+		/**
 		 * Public. Set the magnetometer notification callback.
 		 * @param fun - success callback called repeatedly: fun(data)
 		 * @param interval - accelerometer rate in milliseconds.
@@ -95,6 +132,45 @@ var TISensorTag = (function()
 			instance.magnetometerFun = fun
 			instance.magnetometerInterval = interval
 			instance.requiredServices.push(sensortag.MAGNETOMETER_SERVICE)
+
+			return instance
+		}
+
+		/**
+		 * Public. Set the barometer notification callback.
+		 * @param fun - success callback called repeatedly: fun(data)
+		 * @param interval - accelerometer rate in milliseconds.
+		 */
+		instance.barometerCallback = function(fun)
+		{
+			instance.barometerFun = fun
+			instance.requiredServices.push(sensortag.BAROMETER_SERVICE)
+
+			return instance
+		}
+
+		/**
+		 * Public. Set the gyroscope notification callback.
+		 * @param fun - success callback called repeatedly: fun(data)
+		 * @param interval - accelerometer rate in milliseconds.
+		 */
+		instance.gyroscopeCallback = function(fun, interval)
+		{
+			instance.gyroscopeFun = fun
+			instance.gyroscopeInterval = interval
+			instance.requiredServices.push(sensortag.GYROSCOPE_SERVICE)
+
+			return instance
+		}
+
+		/**
+		 * Public. Set the keypress notification callback.
+		 * @param fun - success callback called when a key is pressed: fun(data)
+		 */
+		instance.keypressCallback = function(fun)
+		{
+			instance.keypressFun = fun
+			instance.requiredServices.push(sensortag.KEYPRESS_SERVICE)
 
 			return instance
 		}
@@ -192,13 +268,43 @@ var TISensorTag = (function()
 		 */
 		instance.activateSensors = function()
 		{
+			instance.irTemperatureOn()
 			instance.accelerometerOn()
+			instance.humidityOn()
 			instance.magnetometerOn()
-			// TODO: Turn off more sensors as they are added.
+			instance.barometerOn()
+			instance.gyroscopeOn()
+			instance.keypressOn()
 		}
 
 		/**
-		 * Turn on accelerometer notification.
+		 * Public. Turn on IR temperature notification.
+		 */
+		instance.irTemperatureOn = function()
+		{
+			instance.sensorOn(
+				sensortag.IRTEMPERATURE_CONFIG,
+				null, // Not used.
+				null, // Not used.
+				sensortag.IRTEMPERATURE_DATA,
+				sensortag.IRTEMPERATURE_NOTIFICATION,
+				instance.irTemperatureFun)
+
+			return instance
+		}
+
+		/**
+		 * Public. Turn off IR temperature notification.
+		 */
+		instance.irTemperatureOff = function()
+		{
+			instance.sensorOff(sensortag.IRTEMPERATURE_DATA)
+
+			return instance
+		}
+
+		/**
+		 * Public. Turn on accelerometer notification.
 		 */
 		instance.accelerometerOn = function()
 		{
@@ -207,13 +313,14 @@ var TISensorTag = (function()
 				sensortag.ACCELEROMETER_PERIOD,
 				instance.accelerometerInterval,
 				sensortag.ACCELEROMETER_DATA,
+				sensortag.ACCELEROMETER_NOTIFICATION,
 				instance.accelerometerFun)
 
 			return instance
 		}
 
 		/**
-		 * Turn off accelerometer notification.
+		 * Public. Turn off accelerometer notification.
 		 */
 		instance.accelerometerOff = function()
 		{
@@ -223,7 +330,33 @@ var TISensorTag = (function()
 		}
 
 		/**
-		 * Turn on magnetometer notification.
+		 * Public. Turn on humidity notification.
+		 */
+		instance.humidityOn = function()
+		{
+			instance.sensorOn(
+				sensortag.HUMIDITY_CONFIG,
+				null, // Not used.
+				null, // Not used.
+				sensortag.HUMIDITY_DATA,
+				sensortag.HUMIDITY_NOTIFICATION,
+				instance.humidityFun)
+
+			return instance
+		}
+
+		/**
+		 * Public. Turn off humidity notification.
+		 */
+		instance.humidityOff = function()
+		{
+			instance.sensorOff(sensortag.HUMIDITY_DATA)
+
+			return instance
+		}
+
+		/**
+		 * Public. Turn on magnetometer notification.
 		 */
 		instance.magnetometerOn = function()
 		{
@@ -232,13 +365,14 @@ var TISensorTag = (function()
 				sensortag.MAGNETOMETER_PERIOD,
 				instance.magnetometerInterval,
 				sensortag.MAGNETOMETER_DATA,
+				sensortag.MAGNETOMETER_NOTIFICATION,
 				instance.magnetometerFun)
 
 			return instance
 		}
 
 		/**
-		 * Turn off magnetometer notification.
+		 * Public. Turn off magnetometer notification.
 		 */
 		instance.magnetometerOff = function()
 		{
@@ -247,10 +381,86 @@ var TISensorTag = (function()
 			return instance
 		}
 
-		// TODO: Add On/Off functions for other sensors.
+		/**
+		 * Public. Turn on barometer notification.
+		 */
+		instance.barometerOn = function()
+		{
+			instance.sensorOn(
+				sensortag.BAROMETER_CONFIG,
+				null, // Not used.
+				null, // Not used.
+				sensortag.BAROMETER_DATA,
+				sensortag.BAROMETER_NOTIFICATION,
+				instance.barometerFun)
+
+			return instance
+		}
 
 		/**
-		 * Helper function for turning on sensor notification.
+		 * Public. Turn off barometer notification.
+		 */
+		instance.barometerOff = function()
+		{
+			instance.sensorOff(sensortag.BAROMETER_DATA)
+
+			return instance
+		}
+
+		/**
+		 * Public. Turn on gyroscope notification.
+		 */
+		instance.gyroscopeOn = function()
+		{
+			instance.sensorOn(
+				sensortag.GYROSCOPE_CONFIG,
+				sensortag.GYROSCOPE_PERIOD,
+				instance.gyroscopeInterval,
+				sensortag.GYROSCOPE_DATA,
+				sensortag.GYROSCOPE_NOTIFICATION,
+				instance.gyroscopeFun)
+
+			return instance
+		}
+
+		/**
+		 * Public. Turn off gyroscope notification.
+		 */
+		instance.gyroscopeOff = function()
+		{
+			instance.sensorOff(sensortag.GYROSCOPE_DATA)
+
+			return instance
+		}
+
+		/**
+		 * Public. Turn on keypress notification.
+		 */
+		instance.keypressOn = function()
+		{
+			instance.sensorOn(
+				null, // Not used.
+				null, // Not used.
+				null, // Not used.
+				sensortag.KEYPRESS_DATA,
+				sensortag.KEYPRESS_NOTIFICATION,
+				instance.keypressFun)
+
+			return instance
+		}
+
+		/**
+		 * Public. Turn off keypress notification.
+		 */
+		instance.keypressOff = function()
+		{
+			instance.sensorOff(sensortag.KEYPRESS_DATA)
+
+			return instance
+		}
+
+		/**
+		 * Private. Helper function for turning on sensor notification.
 		 */
 		instance.sensorOn = function(
 			configUUID,
@@ -264,21 +474,21 @@ var TISensorTag = (function()
 			if (!notificationFunction) { return }
 
 			// Set sensor configuration to ON.
-			instance.device.writeCharacteristic(
+			configUUID && instance.device.writeCharacteristic(
 				configUUID,
 				new Uint8Array([1]),
 				function() {},
 				instance.errorFun)
 
 			// Set sensor update period.
-			instance.device.writeCharacteristic(
+			periodUUID && periodValue && instance.device.writeCharacteristic(
 				periodUUID,
 				new Uint8Array([periodValue / 10]),
 				function() {},
 				instance.errorFun)
 
 			// Set sensor notification to ON.
-			instance.device.writeDescriptor(
+			dataUUID && notificationUUID && instance.device.writeDescriptor(
 				dataUUID, // Characteristic for data
 				notificationUUID, // Configuration descriptor
 				new Uint8Array([1,0]),
@@ -286,9 +496,9 @@ var TISensorTag = (function()
 				instance.errorFun)
 
 			// Start sensor notification.
-			instance.device.enableNotification(
+			dataUUID && instance.device.enableNotification(
 				dataUUID,
-				notificationFunction,
+				function(data) { notificationFunction(new Int8Array(data)) },
 				instance.errorFun)
 
 			return instance
@@ -299,7 +509,7 @@ var TISensorTag = (function()
 		 */
 		instance.sensorOff = function(dataUUID)
 		{
-			instance.device.disableNotification(
+			dataUUID && instance.device.disableNotification(
 				dataUUID,
 				function() {},
 				instance.errorFun)
