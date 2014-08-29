@@ -42,17 +42,16 @@ app.initialize = function()
 // the iBeacon API is now available.
 app.onDeviceReady = function()
 {
+	// Specify a shortcut for the location manager holding the iBeacon functions.
 	window.locationManager = cordova.plugins.locationManager
 
+	// Start tracking beacons!
 	app.startScanForBeacons()
 }
 
-//didRangeBeaconsInRegion: {"region":{"identifier":"page-feet","uuid":"A4950001-C5B1-4B44-B512-1370F02D74DE","major":1,"minor":1,"typeName":"BeaconRegion"},"eventType":"didRangeBeaconsInRegion","beacons":[{"minor":1,"rssi":-40,"major":1,"proximity":"ProximityImmediate","uuid":"A4950001-C5B1-4B44-B512-1370F02D74DE"}]}
-
-
 app.startScanForBeacons = function()
 {
-	console.log('startScanForBeacons')
+	//console.log('startScanForBeacons')
 
 	// The delegate object contains iBeacon callback functions.
 	var delegate = locationManager.delegate.implement(
@@ -82,16 +81,16 @@ app.startScanForBeacons = function()
 	{
 		var region = app.beaconRegions[r]
 
-		var beaconRegion = new cordova.plugins.locationManager.BeaconRegion(
+		var beaconRegion = new locationManager.BeaconRegion(
 			region.id, region.uuid, region.major, region.minor)
 
-		cordova.plugins.locationManager.startMonitoringForRegion(beaconRegion)
+		locationManager.startMonitoringForRegion(beaconRegion)
 			.fail(console.error)
 			.done()
 
 		// Monitoring a region will also start ranging it, so we don't need to
 		// start ranging.
-		//cordova.plugins.locationManager.startRangingBeaconsInRegion(beaconRegion)
+		//locationManager.startRangingBeaconsInRegion(beaconRegion)
 		//	.fail(console.error)
 		//	.done()
 	}

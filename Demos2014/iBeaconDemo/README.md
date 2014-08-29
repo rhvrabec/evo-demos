@@ -1,170 +1,151 @@
-<h1>DIY Arduino Beacons</h1>
+# iBeacon apps made easy
 
-This example is a mobile app for Android and iOS that uses an Arduino board as a beacon. This is like a Do-It-Yourself version of Apple's <a href="http://en.wikipedia.org/wiki/IBeacon">iBeacon</a> technology. Under the hood, an iBeacon is just a small BLE (Bluetooth Low Energy) device that advertises a specific UUID (Universally Unique Identifier). If we put an BLE shield on an Arduino, we have all that we need to do something similar. Arduino compatible boards with built in BLE also work fine, such as the <a href="http://redbearlab.com/">RedBearLab Blend Micro</a> board or the <a href="http://punchthrough.com/bean/">LightBlue Bean</a>.
+It can take some effort to create an iBeacon app, especially if you want it to be available on both iOS and Android. This tutorial shows how to to create an iBeacon mobile application using Evothings Studio.
 
-<h2>The example app - Beacons for relaxation</h2>
-The mobile app used in this tutorial is meant for use in a place where we want to give people time to relax and experience calm, for example a museum, an airport, a medical center, or a park.
+[Demo video]
 
-When approaching a beacon, the app will display a page that suggests a method for relaxation. The beacon itself (the Arduino board) could be used just as it is, or be placed inside some object that signify the existence of a beacon, or be visually hidden.
+## What are iBeacons?
 
-Screenshot from the app:
+iBeacons are like very small lighthouses sending out signals that can be detected by a mobile application. The app can sense if a particular beacon is near or far away.  iBeacons are typically small devices powered by battery. Applications include notifications based on position/range, for example security information, commercial offerings, ads, tourist information, museum information, etc.
 
-<img style="width:150px;height:auto;margin-right:5px;" src="http://evomedia.evothings.com/2014/08/relaxing-places-screen1.png" alt="relaxing-places-screen1" />
+[iBeacon](https://developer.apple.com/ibeacon/) is Apple's beacon technology brand name and implementation. It is based on the Bluetooth Low Energy (BLE) wireless communication standard.
 
-There could be as many beacons as you would want, in this example we will use three beacons.
+The BLE standard specifies an advertising mode, which is what iBeacons use. When a BLE device is in advertisement mode it repeatedly broadcasts packets over radio. The advertisement packet contains the name of the device and a scan record that can hold up to x bytes of data. Apple uses the scan record to send out a UUID that uniquely identifies the beacon.
 
-The reason we are using the Arduino for the beacons is that it can be easily programmed, and that it is a cool tinker-friendly piece of technology that you can evolve far beyond the limits of iBeacons.
+There are several companies that make iBeacons, like [Estimote](http://estimote.com/), [Punch Through Design](http://punchthrough.com/bean/), [Kontakt](http://kontakt.io/), and [numerous additional offerings exist](http://www.alibaba.com/countrysearch/CN/ibeacon.html). The beekn website/blog presents an [iBeacon guide](http://beekn.net/guide-to-ibeacons/).
 
-<h2>How to make the Arduino work as a Beacon</h2>
+[Photographs of iBeacons]
 
-When a beacon is sending out signals, it uses the BLE advertise mode. The device repeatedly sends out information about itself, including a name that you can set in your Arduino code. In addition, the signal strength is available (RSSI = Received Signal Strength Indicator), which can be used to determine which beacon is the closest one. When you walk around with your mobile phone in your hand, another beacon will eventually become the closest one, and the app will then show the information associated with that beacon. As you will see, it is remarkably simple to program this kind of mobile application using Evothings Studio.
+## iBeacon APIs for mobile platforms
 
-The Arduino sketch will in essence do just one thing, set the name of the BLE shield. This name will be used for BLE advertisements. Note that you will have to load a sketch with a unique BLE name onto every Arduino board you intend to use as a beacon (if you would use the same name, there would be no way to tell the difference between the Arduinos).
+iOS has an [iBeacon API](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html) that you must use to scan for beacon information. Notably, the CoreBuetooth API cannot be used to detect beacons, as scan records that contain iBeacon headers are blocked by Apple.
 
-Arduino code (file <a href="https://github.com/divineprog/evo-demos/blob/master/Demos2014/ArduinoBeacon/ArduinoBeacon/ArduinoBeacon.ino">ArduinoBeacon.ino</a>):
-<pre>// Arduino code for example Arduino BLE Beacon.
-// Evothings AB, 2014
+Android and other platforms that support BLE can scan for iBeacons without any restrictions.
 
-// Include BLE files.
-#include
-#include
-#include &lt;RBL_nRF8001.h&gt;
-#include
+There are several iBeacon plugins for Cordova/PhoneGap, for example the [plugin by Peter Metz](https://github.com/petermetz/cordova-plugin-ibeacon).
 
-// This function is called only once, at reset.
-void setup()
-{
-    // Enable serial debug.
-    Serial.begin(9600);
-    Serial.println("Arduino Beacon example started");
-    Serial.println("Serial rate set to 9600");
+While Apple place restrictions of how their own APIs can be used on iOS, other platforms can implement iBeacon libraries and applications without these restrictions. In addition, Apple does not manufacture iBeacon devices, they are a third party product. The openness of the BLE standard and the diversity of iBeacon hardware devices open up for lots or innovative beacon applications.
 
-    // Set a custom BLE name for the beacon.
-    // Note that each Arduino should be given a unique name!
-    ble_set_name("BEACON1");
+## Example app - iBeacons that make you relax
 
-    // Initialize BLE library.
-    ble_begin();
+In a previous blogpost on ["DIY" beacon technology](http://evothings.com/diy-arduino-beacons/) we made an example app about ways to relax. Different relaxation techniques are shown depending on which beacon is closest to your mobile phone.
 
-    Serial.println("Beacon activated");
-}
+Here we will implement the same application, but this time we will use Apple's iBeacon technology.
 
-// This function is called continuously, after setup() completes.
-void loop()
-{
-    // Process BLE events.
-    ble_do_events();
-}
-</pre>
+The app has four pages. When you are close to a beacon, an information page presenting a relaxation technique is shown. When no beacons are near, a default page is shown. This type of application could be used in a museum or library, at a university, or at some other public location where visitors can be given time to relax.
 
-<h2>How the mobile app works</h2>
+[Screenshots from the app]
 
-The mobile app that monitors beacons is developed in HTML and JavaScript using Evothings Studio. The app will run in the Evothings Client app. As the final step, we will host the code on a web server, so that the visitors of the place where we have placed the beacons can easily run the app. (Note that <a href="http://evomedia.evothings.com/doc/apps-build-overview.html">you can also make a native app</a> and publish it on the app stores.)
+## Implementation overview
 
-The app continuously scans for advertising BLE devices, then determine which are our beacons, and shows the information page associated with the beacons that is closest. If no beacon is within range, a default info page will be shown. The range of BLE signals is about 10 to 30 meters.
+The app is developed in HTML/JavaScript. For iBeacon functionality the [cordova-ibeacon plugin](https://github.com/petermetz/cordova-plugin-ibeacon) is used (documentation is found by following the link). To deploy the app you can either use Evothings Client or build a native app that you publish on the app stores.
 
-The HTML content of the pages shown in the application's webview is found in <a href="https://github.com/divineprog/evo-demos/blob/master/Demos2014/ArduinoBeacon/index.html">index.html</a>. Each page is defined within a div tag.
+[Source code is on GitHub](https://github.com/divineprog/evo-demos/tree/master/Demos2014/iBeaconDemo).
 
-Monitoring beacons and selecting which info page to show is done in JavaScript code, found in file <a href="https://github.com/divineprog/evo-demos/blob/master/Demos2014/ArduinoBeacon/app.js">app.js</a>.
+File [index.html](https://github.com/divineprog/evo-demos/blob/master/Demos2014/iBeaconDemo/index.html) contains HTML data for the info pages of the application.
 
-Here is the dictionary definition for the beacon pages (in app.js):
-<pre>// Mapping of beacon names to page ids.
-app.beaconPages =
-{
-    'BEACON1':'page-feet',
-    'BEACON2':'page-shoulders',
-    'BEACON3':'page-face'
-}
-</pre>
+The JavaScript code that contains the iBeacon setup and logic is in file [app.js](https://github.com/divineprog/evo-demos/blob/master/Demos2014/iBeaconDemo/app.js).
 
-Note that the names of your beacons must match the names used as keys in the above dictionary.
+## Tracking iBeacons - ranging vs. monitoring
 
-And here is the code that gets called each time a BLE device advertisement is received by the app (this happens continuously):
-<pre>app.deviceFound = function(deviceInfo)
-{
-    // Have we found one of our beacons?
-    if (app.beaconPages[deviceInfo.name] && deviceInfo.rssi < 0)
-    {
-        // Update signal strength for beacon.
-        app.beaconRSSI[deviceInfo.name] =
-        {
-            rssi: deviceInfo.rssi,
-            timestamp: Date.now()
-        }
-    }
-}
-</pre>
+To track iBeacons, you specify regions for the beacons for which you want to get notifications. Here is the code that defines the regions for the pages, the id is used to identify the page associated with a beacon:
 
-Logic for selection the closest beacon is found in the timer function <strong>app.runSelectPageTimer</strong>, which gets called at regular intervals.
+	// Regions that define which page to show for each beacon.
+	app.beaconRegions =
+	[
+		{
+			id: 'page-feet',
+			uuid:'A4950001-C5B1-4B44-B512-1370F02D74DE',
+			major: 1,
+			minor: 1
+		},
+		{
+			id: 'page-shoulders',
+			uuid:'A4950001-C5B1-4B44-B512-1370F02D74DE',
+			major: 1,
+			minor: 2
+		},
+		{
+			id: 'page-face',
+			uuid:'A4950001-C5B1-4B44-B512-1370F02D74DE',
+			major: 1,
+			minor: 3
+		}
+	]
 
-In total, the app has the following code files:
+Note that you need to know the UUID of the beacons you wish to track. Same UIID can be shared by multipel beacons, in which case you can use the major and minor integer numbers to uniquely identify a beacon. It is however not mandatory to specify the major/minor numbers when tracking for beacons.
 
-<ul>
-	<li>index.html - main page, contains div tags for info pages</li>
-	<li>app.js - the JavaScript code for the app, included in index.html</li>
-	<li>page.css - style sheet definitions</li>
-	<li>ArduinoBeacon - folder with the ArduinoBeacon.ino file</li>
-</ul>
+Different iBeacon vendors have different method for how to finding/specifying the UUID and major/minor numbers. When testing the relaxation app, we used the [LightBlue Bean](http://punchthrough.com/bean/), which is straightforward to configure over BLE.
 
-There are also image files used in the app. You will find <a href="https://github.com/divineprog/evo-demos/tree/master/Demos2014/ArduinoBeacon">all project files on GitHub</a>.
+## Ranging vs. monitoring
 
-<h2>Running the app using Evothings Studio</h2>
-<ul>
-	<li>To run the app, first download Evothings Studio. </li>
-	<li>Then install the Evothings Client app on your mobile device(s).</li>
-	<li>Download the code for the app from GitHub into a folder on your computer.</li>
-	<li>Drag the file index.html into Evothings Workbench.</li>
-	<li>Connect from the Evothings Client app to the Workbench.</li>
-	<li>Press RUN in the Workbench window.</li>
-	<li>Remember to configure your Arduinos with the proper names for the app to work!</li>
-</ul>
+Next we will look a the code for tracking beacons. Note that two types of tracking are used for iBeacons. Monitoring, which is enabled by **startMonitoringForRegion**, tracks the entering and exiting regions. Monitoring can be run both when the app is in the foreground and in the background, can be slow, and does not contain proximity information. Ranging, enabled by **startRangingBeaconsInRegion**, works only in the foreground, is fast and has proximity information (ProximityImmediate, ProximityNear, ProximityFar). For further details regarding iBeacons and background vs foreground modes, explore [this report from Radius Networks](http://developer.radiusnetworks.com/2013/11/13/ibeacon-monitoring-in-the-background-and-foreground.html)
 
-<h2>Running the app from a web server</h2>
-To share the app with others, you can host it on a web server. Do as follows:
-<ul>
-	<li>Download the code for the app from GitHub and put it on a web server.</li>
-	<li>Ask your users to install the Evothings Client app on their mobile devices.</li>
-	<li>Connect from Evothings Client to the web server by entering the address to the server in the app and tap CONNECT. For example, if you put the files on a web server with the address <code>http://myserver.com/mybeaconapp</code> just enter that address in Evothings Client and connect.</li>
-	<li>Remember to configure your Arduinos with the proper names for the app to work!</li>
-</ul>
+When you enable monitoring you also enable ranging. Therefore it is sufficient to enable monitoring if you wish to use both tracking types. If you wish to use ranging only, you do not need to enable monitoring.
 
-<h2>Use any BLE device as a beacon</h2>
+The example app uses ranging to determine proximity of the relaxation beacons. However, the code does enable beacons, for demonstrational purposes. The following piece of code iterates over the regions and enables monitoring and ranging:
 
-You should be able to use almost any BLE device that does advertising as a beacon. Just enter the name of the device in the dictionary <strong>app.beaconPages</strong> as shown above.
+	// Start monitoring and ranging our beacons.
+	for (var r in app.beaconRegions)
+	{
+		var region = app.beaconRegions[r]
 
-You can use the app <strong>BLE Scan</strong> that comes as an example included with Evothings Studio to determine the name of your BLE devices.
+		var beaconRegion = new cordova.plugins.locationManager.BeaconRegion(
+			region.id, region.uuid, region.major, region.minor)
 
-The advantage of using an Arduino as a beacon is that you can change its name used for advertising.
+		cordova.plugins.locationManager.startMonitoringForRegion(beaconRegion)
+			.fail(console.error)
+			.done()
 
-You can also change the name of the <a href="http://punchthrough.com/bean/">LightBlue Bean</a> device, by connecting to a bean using the <a href="http://punchthrough.com/bean/getting-started/">Bean Loader App</a> and clicking on the name and edit it (no coding required to do this).
+		// Monitoring a region will also start ranging it, so we don't need to
+		// start ranging.
+		//cordova.plugins.locationManager.startRangingBeaconsInRegion(beaconRegion)
+		//	.fail(console.error)
+		//	.done()
+	}
 
-Other devices have other procedures for setting the name, and some devices you cannot change the name for.
+## Responding to iBeacon events
 
-An alternative to using the advertising name for determining the identity of the beacon is to use the device address. This does however work differently on Android and on iOS, as the device address will be different depending on the platform. What you could do is to check for both of the addresses reported on iOS and on Android.
+To listen for beacon events, a delegate object with callback functions is used, as is shown in the following code snippet:
 
-Here is a code snippet you can use to find the name and address of your BLE devies. This code prints the device name and address to the debug console found under the TOOLS button in Evothings Workbench:
+	// The delegate object contains iBeacon callback functions.
+	var delegate = locationManager.delegate.implement(
+	{
+		didDetermineStateForRegion: function(pluginResult)
+		{
+			//console.log('didDetermineStateForRegion: ' + JSON.stringify(pluginResult))
+		},
 
-<pre>app.deviceFound = function(deviceInfo)
-{
-    hyper.log('Found device: ' + deviceInfo.name + '  ' + deviceInfo.address)
-}
-</pre>
+		didStartMonitoringForRegion: function(pluginResult)
+		{
+			//console.log('didStartMonitoringForRegion:' + JSON.stringify(pluginResult))
+		},
 
-<h2>Finding the documentation for the BLE plugin</h2>
+		didRangeBeaconsInRegion: function(pluginResult)
+		{
+			//console.log('didRangeBeaconsInRegion: ' + JSON.stringify(pluginResult))
+			app.didRangeBeaconsInRegion(pluginResult)
+		}
+	})
 
-It can be a bit confusing when you are new to Evothings Studio to understand where the Cordova JavaScript files are. Here is a short explanation.
+The pluginResult object contains information about ranged beacon(s). Examine the code in file [app.js](https://github.com/divineprog/evo-demos/blob/master/Demos2014/iBeaconDemo/app.js) for further details. To enable logging, uncomment the console.log calls. Log output will be shown in the "Tools" window of Evothings Workbench.
 
-The Cordova BLE plugin shipped with the Evothings Client app is documented in the <a href="https://github.com/evothings/cordova-ble/blob/master/ble.js">JavaScript file for the plugin</a>. This JavaScript file is built into the Evothings Client app, and needs not be part of your application if you run the app from Evothings Client.
+As mentioned above, the example app uses ranging, but monitoring is also supplied for educational purposes.
 
-Note that you never should include ble.js explicitly in your app code. It will be included automatically when you include cordova.js.
+## Running the example app
 
-Also note that all the cordova.js files (including ble.js) are already in the Evothings Client app. That is why they are not present among the project files for the application.
+To run the example app, do as follows:
 
-<h2>Where to go from here</h2>
+* [Download the source code from GitHub](https://github.com/divineprog/evo-demos/tree/master/Demos2014/iBeaconDemo)
+* Start Evothings Workbench on a desktop machine
+* Launch the Evothings Client app on a mobile device and connect to the Workbench
+* Drag the index.html file of the example into the Workbench project list
+* Edit file app.js to contain the UUIDs and major/minor numbers of your iBeacons (alternatively configure your iBeacons with the values used in the example)
+* Click the RUN button in the Workbench project list
+* When the app has loaded onto the mobile device, move it close to the beacons to see the different relaxation pages
 
-This tutorial was meant to introduce the concept of "Do-It-Yourself" beacons, which works differently from Apple's iBeacons. While both DIY beacons and iBeacons build on the same technology, there are some twists to iBeacons, covered in <a href="http://www.mutualmobile.com/posts/ibeacons-lessons-learned">this blogpost by Sean McMains at mutualmobile</a>.
+Note that you can try out the example even if you have only one iBeacon. In this case, the page associated with the beacon will display when you are close to it. The default page will be shown when the beacon is out of range or turned off.
 
-Evothings Client includes a <a href="https://github.com/petermetz/cordova-plugin-ibeacon">Cordova iBeacon plugin</a>, that you can use to develop apps for Apple's iBeacon technology. See the <a href="http://evomedia.evothings.com/doc/ibeacon-scan.html">iBeacon Scan example app</a> that comes with Evothings Studio.
+You can create your own iBeacon using a computer that supports BLE. For example, here is [how to turn a Raspberry Pi into an iBeacon](http://www.theregister.co.uk/2013/11/29/feature_diy_apple_ibeacons/). For a specification of the iBeacon advertisement format, see for instance [here](http://en.wikipedia.org/wiki/IBeacon) and [here](http://stackoverflow.com/questions/18906988/what-is-the-ibeacon-bluetooth-profile).
 
-Please feel free to drop in on the <a href="http://forum.evothings.com/">Evothings Forum</a>, to discuss technology, applications, ask questions, and share experiences.
-
+To create a native app, follow the [build instructions](http://evomedia.evothings.com/doc/apps-build-overview.html) in the Evothings Studio documentation.
