@@ -47,6 +47,9 @@ var TISensorTag = (function()
 
 	sensortag.KEYPRESS_SERVICE = '0000ffe0-0000-1000-8000-00805f9b34fb'
 	sensortag.KEYPRESS_DATA = '0000ffe1-0000-1000-8000-00805f9b34fb'
+	sensortag.KEYPRESS_NOTIFICATION = '00002902-0000-1000-8000-00805f9b34fb'
+
+	// TODO: Add KEYPRESS_NOTIFICATION, upgrade firmware.
 
 	/**
 	 * Internal. Override if needed.
