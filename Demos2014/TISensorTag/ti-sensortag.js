@@ -49,7 +49,7 @@ var TISensorTag = (function()
 	sensortag.KEYPRESS_DATA = '0000ffe1-0000-1000-8000-00805f9b34fb'
 	sensortag.KEYPRESS_NOTIFICATION = '00002902-0000-1000-8000-00805f9b34fb'
 
-	// TODO: Add KEYPRESS_NOTIFICATION, upgrade firmware.
+	// TODO: Upgrade firmware and test if missing period characteristics are present.
 
 	/**
 	 * Internal. Override if needed.

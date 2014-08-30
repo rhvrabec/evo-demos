@@ -28,27 +28,35 @@
 <body>
 	<h1>TI SensorTag</h1>
 
+	<div class="SensorData" id="KeypressData">Keypress:<br/>[Waiting for value]</div>
 	<div class="SensorData" id="IRTemperatureData">IRTemperature:<br/>[Waiting for value]</div>
 	<div class="SensorData" id="AccelerometerData">Accelerometer:<br/>[Waiting for value]</div>
 	<div class="SensorData" id="HumidityData">Humidity:<br/>[Waiting for value]</div>
 	<div class="SensorData" id="MagnetometerData">Magnetometer:<br/>[Waiting for value]</div>
 	<div class="SensorData" id="BarometerData">Barometer:<br/>[Waiting for value]</div>
 	<div class="SensorData" id="GyroscopeData">Gyroscope:<br/>[Waiting for value]</div>
-	<div class="SensorData" id="KeypressData">Keypress:<br/>[Waiting for value]</div>
 
 	<script>
 	function initialiseSensortag()
 	{
 		var sensorTag = TISensorTag.createInstance()
 		sensorTag
+			.keypressCallback(keypressHandler)
 			.irTemperatureCallback(irTemperatureHandler)
 			.humidityCallback(humidityHandler)
 			.barometerCallback(barometerHandler)
 			.accelerometerCallback(accelerometerHandler, 100)
 			.magnetometerCallback(magnetometerHandler, 100)
 			.gyroscopeCallback(gyroscopeHandler, 100)
-			.keypressCallback(keypressHandler)
 			.connectToClosestDevice()
+	}
+
+	function keypressHandler(data)
+	{
+		displaySensorValue(
+			'KeypressData',
+			'Keypress',
+			data[0])
 	}
 
 	function irTemperatureHandler(data)
@@ -101,14 +109,6 @@
 			'Gyroscope',
 			data[0] + ',' + data[1] + ',' + data[2] + ','
 			+ data[3] + ',' + data[4] + ',' + data[5])
-	}
-
-	function keypressHandler(data)
-	{
-		displaySensorValue(
-			'KeypressData',
-			'Keypress',
-			data[0])
 	}
 
 	function displaySensorValue(elementId, label, value)

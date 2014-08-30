@@ -1,10 +1,10 @@
-# How to use the TI SensorTag with JavaScript
+# Developing apps for TI SensorTag made easy
 
 Mikael Kindborg, Evothings AB
 
-## Quickly develop apps for Internet of Things (IoT)
+## Quickly develop apps for the TI SensorTag
 
-Evothings Studio is a set of development tools that makes it fun to develop IoT-apps for mobile phones and tablets. In this article, we will take a look at a high-level library for the TI SensorTag, a BLE (Bluetooth Low Energy) device that features all sorts of sensors. With this library, it is easy to write mobile apps in JavaScript and HTML for the SensorTag.
+It can be quite a challenge to program mobile applications for the Internet of Things (IoT) using Bluetooth Low Energy (BLE). By using high-level JavaScript libraries, IoT app development can be made more fun and easy. In this tutorial, we will have a look at a high-level library for the TI SensorTag, a BLE device that features all sorts of sensors. With this library it is easy to write mobile apps in JavaScript and HTML for the SensorTag.
 
 ## The TI SensorTag
 
@@ -14,13 +14,116 @@ Photo of the TI SensorTag:
 
 ![TI SensorTag](TISensorTag600x400.png)
 
+There are several ways to develop applications for the SensorTag. Here we will show how to use a high-level JavaScript library, that makes it fast and easy to develop SensorTag apps.
+
 ## Demo app
 
 The demo app showcases the TI SensorTag. Coded in JavaScript, the app runs on a mobile phone or tablet (Android or iOS). Input from the TI SensorTag is displayed on-screen in real time.
 
-This is what the app looks like:
+Screenshot from the app:
 
 ![TISensorTag screenshot](TISensorTagScreenshot600x340.jpg)
+
+## In the code
+
+The demo app consists of the following files:
+
+* [index.html]() - the complete application code (HTML and JavaScript)
+* [ti-sensortag.js]() - high-level TI SensorTag library
+* [easy-ble.js]() - high-level BLE library
+
+
+To read sensors on the SensorTag, the program must turn on sensors, enable notifications and so on, using BLE calls. The  TI SensorTag library abstracts the low-level BLE code, UUIDs etc, and provides high-level functions for enabling and reading sensors.
+
+In total, the demo app is 77 lines of JavaScript code. Here is the complete listing:
+
+    function initialiseSensortag()
+    {
+        var sensorTag = TISensorTag.createInstance()
+        sensorTag
+            .keypressCallback(keypressHandler)
+            .irTemperatureCallback(irTemperatureHandler)
+            .humidityCallback(humidityHandler)
+            .barometerCallback(barometerHandler)
+            .accelerometerCallback(accelerometerHandler, 100)
+            .magnetometerCallback(magnetometerHandler, 100)
+            .gyroscopeCallback(gyroscopeHandler, 100)
+            .connectToClosestDevice()
+    }
+
+    function keypressHandler(data)
+    {
+        displaySensorValue(
+            'KeypressData',
+            'Keypress',
+            data[0])
+    }
+
+    function irTemperatureHandler(data)
+    {
+        displaySensorValue(
+            'IRTemperatureData',
+            'IRTemperature',
+            data[0] + ',' + data[1] + ',' + data[2] + ',' + data[3])
+    }
+
+    function accelerometerHandler(data)
+    {
+        displaySensorValue(
+            'AccelerometerData',
+            'Accelerometer',
+            data[0] + ',' + data[1] + ',' + data[2])
+    }
+
+    function humidityHandler(data)
+    {
+        displaySensorValue(
+            'HumidityData',
+            'Humidity',
+            data[0] + ',' + data[1] + ',' + data[2] + ',' + data[3])
+    }
+
+    function magnetometerHandler(data)
+    {
+        displaySensorValue(
+            'MagnetometerData',
+            'Magnetometer',
+            data[0] + ',' + data[1] + ',' + data[2])
+    }
+
+    function barometerHandler(data)
+    {
+        displaySensorValue(
+            'BarometerData',
+            'Barometer',
+            data[0] + ',' + data[1] + ',' + data[2] + ',' + data[3])
+    }
+
+    function gyroscopeHandler(data)
+    {
+        displaySensorValue(
+            'GyroscopeData',
+            'Gyroscope',
+            data[0] + ',' + data[1] + ',' + data[2] + ','
+            + data[3] + ',' + data[4] + ',' + data[5])
+    }
+
+    function displaySensorValue(elementId, label, value)
+    {
+        document.getElementById(elementId).innerHTML = label + ':&lt;br/&gt;' + value
+    }
+
+    document.addEventListener('deviceready', initialiseSensortag, false)
+
+When the app starts, the **initialiseSensortag** function is called. This function creates a SensorTag object that we use to enable sensors. The API for defining sensors uses a "fluent" style, where you chain together function calls.
+
+For each sensor you wish to use, a callback function is given. This function will be called when sensor values are updated. Some sensors have a setting for the update interval, given in milliseconds.
+
+As the final initialisation step, the function **connectToClosestDevice** is called. This makes the app scan for and connect to the SensorTag with the strongest RSSI (signal strength) value.
+
+The callback functions take a data parameter, that contains an array of sensor values (byte values). The number of data values differ depending on the sensor. For the full documentation of sensors and sensor values, see  [SensorTag_User_Guide](http://processors.wiki.ti.com/index.php/SensorTag_User_Guide) and
+[BLE_SensorTag_GATT_Server.pdf](http://processors.wiki.ti.com/index.php/File:BLE_SensorTag_GATT_Server.pdf).
+
 
 ## Running the app using Evothings Studio
 
@@ -65,3 +168,5 @@ How to build a native app with Cordova is described in the [Evothings Build Docu
 ## Share your projects
 
 Announce your apps and keep the discussion going on the [Evothings Forum](http://forum.evothings.com/).
+
+Evothings Studio is a set of development tools that makes it fun to develop IoT-apps for mobile phones and tablets.
