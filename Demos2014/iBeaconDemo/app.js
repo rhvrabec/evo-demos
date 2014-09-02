@@ -84,15 +84,15 @@ app.startScanForBeacons = function()
 		var beaconRegion = new locationManager.BeaconRegion(
 			region.id, region.uuid, region.major, region.minor)
 
+		// Start monitoring.
 		locationManager.startMonitoringForRegion(beaconRegion)
 			.fail(console.error)
 			.done()
 
-		// Monitoring a region will also start ranging it, so we don't need to
-		// start ranging.
-		//locationManager.startRangingBeaconsInRegion(beaconRegion)
-		//	.fail(console.error)
-		//	.done()
+		// Start ranging.
+		locationManager.startRangingBeaconsInRegion(beaconRegion)
+			.fail(console.error)
+			.done()
 	}
 }
 
@@ -112,7 +112,7 @@ app.didRangeBeaconsInRegion = function(pluginResult)
 	// The region identifier is the page id.
 	var pageId = pluginResult.region.identifier
 
-	console.log('ranged beacon: ' + pageId + ' ' + beacon.proximity)
+	//console.log('ranged beacon: ' + pageId + ' ' + beacon.proximity)
 
 	// If the beacon is close and represents a new page, then show the page.
 	if ((beacon.proximity == 'ProximityImmediate' || beacon.proximity == 'ProximityNear')

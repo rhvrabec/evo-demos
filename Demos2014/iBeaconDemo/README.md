@@ -2,15 +2,16 @@
 
 It can take some effort to create an iBeacon app, especially if you want it to be available on both iOS and Android. This tutorial shows how to to create an iBeacon mobile application using Evothings Studio.
 
-[Demo video]
+Read the full guide on the [Evothings website](http://evothings.com/quick-guide-to-writing-mobile-ibeacon-applications-in-javascript/).
 
+<!--
 ## What are iBeacons?
 
 iBeacons are like very small lighthouses sending out signals that can be detected by a mobile application. The app can sense if a particular beacon is near or far away.  iBeacons are typically small devices powered by battery. Applications include notifications based on position/range, for example security information, commercial offerings, ads, tourist information, museum information, etc.
 
 [iBeacon](https://developer.apple.com/ibeacon/) is Apple's beacon technology brand name and implementation. It is based on the Bluetooth Low Energy (BLE) wireless communication standard.
 
-The BLE standard specifies an advertising mode, which is what iBeacons use. When a BLE device is in advertisement mode it repeatedly broadcasts packets over radio. The advertisement packet contains the name of the device and a scan record that can hold up to x bytes of data. Apple uses the scan record to send out a UUID that uniquely identifies the beacon.
+The BLE standard specifies an advertising mode, which is what iBeacons use. When a BLE device is in advertisement mode it repeatedly broadcasts packets over radio. The advertisement packet contains the name of the device and a scan record that can hold a limited amount of of data. Apple uses the scan record to send out a UUID that uniquely identifies the beacon.
 
 There are several companies that make iBeacons, like [Estimote](http://estimote.com/), [Punch Through Design](http://punchthrough.com/bean/), [Kontakt](http://kontakt.io/), and [numerous additional offerings exist](http://www.alibaba.com/countrysearch/CN/ibeacon.html). The beekn website/blog presents an [iBeacon guide](http://beekn.net/guide-to-ibeacons/).
 
@@ -79,11 +80,10 @@ Different iBeacon vendors have different method for how to finding/specifying th
 
 ## Ranging vs. monitoring
 
-Next we will look a the code for tracking beacons. Note that two types of tracking are used for iBeacons. Monitoring, which is enabled by **startMonitoringForRegion**, tracks the entering and exiting regions. Monitoring can be run both when the app is in the foreground and in the background, can be slow, and does not contain proximity information. Ranging, enabled by **startRangingBeaconsInRegion**, works only in the foreground, is fast and has proximity information (ProximityImmediate, ProximityNear, ProximityFar). For further details regarding iBeacons and background vs foreground modes, explore [this report from Radius Networks](http://developer.radiusnetworks.com/2013/11/13/ibeacon-monitoring-in-the-background-and-foreground.html)
+Next we will look a the code for tracking beacons. Note that two types of tracking are used for iBeacons. Monitoring, which is enabled by **startMonitoringForRegion**, tracks the entering and exiting regions. Monitoring can be run both when the app is in the foreground and in the background, may have a low update rate, and does not contain proximity information. Ranging, enabled by **startRangingBeaconsInRegion**, works only in the foreground, has a fast update rate, and has proximity information (ProximityImmediate, ProximityNear, ProximityFar). For further details regarding iBeacons and background vs foreground modes, explore [this report from Radius Networks](http://developer.radiusnetworks.com/2013/11/13/ibeacon-monitoring-in-the-background-and-foreground.html)
 
-When you enable monitoring you also enable ranging. Therefore it is sufficient to enable monitoring if you wish to use both tracking types. If you wish to use ranging only, you do not need to enable monitoring.
 
-The example app uses ranging to determine proximity of the relaxation beacons. However, the code does enable beacons, for demonstrational purposes. The following piece of code iterates over the regions and enables monitoring and ranging:
+The example app uses ranging to determine proximity of the relaxation beacons. However, the code also enables monitoring of beacons for demonstrational purposes. The following piece of code iterates over the regions and enables monitoring and ranging for each region:
 
 	// Start monitoring and ranging our beacons.
 	for (var r in app.beaconRegions)
@@ -93,15 +93,15 @@ The example app uses ranging to determine proximity of the relaxation beacons. H
 		var beaconRegion = new cordova.plugins.locationManager.BeaconRegion(
 			region.id, region.uuid, region.major, region.minor)
 
+		// Start monitoring.
 		cordova.plugins.locationManager.startMonitoringForRegion(beaconRegion)
 			.fail(console.error)
 			.done()
 
-		// Monitoring a region will also start ranging it, so we don't need to
-		// start ranging.
-		//cordova.plugins.locationManager.startRangingBeaconsInRegion(beaconRegion)
-		//	.fail(console.error)
-		//	.done()
+		// Start ranging.
+		cordova.plugins.locationManager.startRangingBeaconsInRegion(beaconRegion)
+			.fail(console.error)
+			.done()
 	}
 
 ## Responding to iBeacon events
@@ -149,3 +149,4 @@ Note that you can try out the example even if you have only one iBeacon. In this
 You can create your own iBeacon using a computer that supports BLE. For example, here is [how to turn a Raspberry Pi into an iBeacon](http://www.theregister.co.uk/2013/11/29/feature_diy_apple_ibeacons/). For a specification of the iBeacon advertisement format, see for instance [here](http://en.wikipedia.org/wiki/IBeacon) and [here](http://stackoverflow.com/questions/18906988/what-is-the-ibeacon-bluetooth-profile).
 
 To create a native app, follow the [build instructions](http://evomedia.evothings.com/doc/apps-build-overview.html) in the Evothings Studio documentation.
+-->
