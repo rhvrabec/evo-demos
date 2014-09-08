@@ -4,11 +4,11 @@ Example program that connects to a BLE device and lists services, characteristic
 
 The purpose is to provide some basic code as a starting point for learning, tinkering and experimenting.
 
-This is not a ready to use app, rather it is meant to be run in Evothings Workbench, inspect the output log in the "Tools" Window.
+This is not a ready to use app, rather it is meant to be run from Evothings Workbench, inspecting the output log in the "Tools" Window.
 
 ## BLE Crash Course
 
-The structure of a BLE device is like this:
+The structure of a BLE device looks like this:
 
 	device
 	  services
@@ -23,11 +23,11 @@ Key points:
 
 To connect to a BLE device, you first scan for BLE devices, then connect to the device you wish to use. Here is an outline:
 
-1. Scan for devices.
-2. In the scan callback function, identify the device by name (most common method currently, but not perfect).
-3. When the device you want is found, connect to it.
-4. When connected scan for services, characteristics, descriptors.
-5. Write and/or read the characteristics you wish to use. Enable any notifications you will use.
+* Scan for devices.
+* In the scan callback function, identify the device by name (most common method currently, but not perfect).
+* When the device you want is found, connect to it.
+* When connected scan for services, characteristics, descriptors.
+* Write and/or read the characteristics you wish to use. Enable any notifications you will use.
 
 The example app "BLE Scan" in Evothings Studio is a good starting point for learning how to scan for devices. There is currently a bug in this example that causes problems on Android - the function app.stopScan in file app.js should be like this:
 
@@ -64,7 +64,7 @@ To access BLE from JavaScript, the [Evothings BLE plugin for Apache Cordova](htt
 Files of interest:
 
 * [ble.js](https://github.com/evothings/cordova-ble/blob/master/ble.js) is the API for the BLE plugin. This file is shipped with the Evothings Client app (which is built with Cordova), and is not included in the source code for the BLE Explorer app.
-* [easy-ble.js](https://github.com/divineprog/evo-demos/blob/master/Demos2014/MagicStone/easy-ble.js) is a high-level abstraction of the API in ble.js.
+* [easy-ble.js](https://github.com/divineprog/evo-demos/blob/master/Demos2014/BLEExplorer/easy-ble.js) is a high-level abstraction of the API in ble.js.
 
 Good luck, have fun!
 

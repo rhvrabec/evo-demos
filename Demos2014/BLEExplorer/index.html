@@ -91,7 +91,7 @@
 				var characteristic = service.__characteristics[characteristicUUID]
 				console.log('    characteristic: ' + characteristic.uuid)
 
-				// Print all descriptors for service.
+				// Print all descriptors for characteristic.
 				for (var descriptorUUID in characteristic.__descriptors)
 				{
 					var descriptor = characteristic.__descriptors[descriptorUUID]
