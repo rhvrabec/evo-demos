@@ -205,8 +205,6 @@ var easyble = (function()
 					var service = services[i];
 					device.__services.push(service);
 					device.__uuidMap[service.uuid] = service;
-
-					console.log('Found service: ' + service.uuid);
 				}
 
 				internal.readCharacteristicsForServices(
@@ -239,8 +237,6 @@ var easyble = (function()
 					var characteristic = characteristics[i];
 					service.__characteristics.push(characteristic);
 					device.__uuidMap[characteristic.uuid] = characteristic;
-
-					console.log('  Found characteristic: ' + characteristic.uuid);
 
 					// Read descriptors for characteristic.
 					evothings.ble.descriptors(

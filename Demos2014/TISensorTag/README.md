@@ -20,7 +20,7 @@ The demo app showcases the TI SensorTag. Coded in JavaScript, the app runs on a 
 
 Screenshot from the app:
 
-![TISensorTag screenshot](TISensorTagScreenshot600x340.jpg)
+![TISensorTag screenshot](TISensorTagScreenshot320x480.jpg)
 
 ## In the code
 

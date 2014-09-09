@@ -11,10 +11,15 @@
 	<link rel="stylesheet" href="common.css" />
 	<style>
 	body {
-		background: rgb(255,255,255);
+		background: rgb(255,25,25);
+		color: rgb(255,255,255);
 	}
 	.SensorData {
 		font-size: 22px;
+		font-weight: bold;
+	}
+	.SensorData span {
+		font-weight: normal;
 	}
 	</style>
 	<script>
@@ -28,19 +33,21 @@
 <body>
 	<h1>TI SensorTag</h1>
 
-	<div class="SensorData" id="KeypressData">Keypress:<br/>[Waiting for value]</div>
-	<div class="SensorData" id="IRTemperatureData">IRTemperature:<br/>[Waiting for value]</div>
-	<div class="SensorData" id="AccelerometerData">Accelerometer:<br/>[Waiting for value]</div>
-	<div class="SensorData" id="HumidityData">Humidity:<br/>[Waiting for value]</div>
-	<div class="SensorData" id="MagnetometerData">Magnetometer:<br/>[Waiting for value]</div>
-	<div class="SensorData" id="BarometerData">Barometer:<br/>[Waiting for value]</div>
-	<div class="SensorData" id="GyroscopeData">Gyroscope:<br/>[Waiting for value]</div>
+	<div class="SensorData">Status: <span id="StatusData">Ready to connect</span></div>
+	<div class="SensorData">Keypress: <span id="KeypressData">[Waiting for value]</span></div>
+	<div class="SensorData">IRTemperature:<br/><span id="IRTemperatureData">[Waiting for value]</span></div>
+	<div class="SensorData">Accelerometer:<br/><span id="AccelerometerData">[Waiting for value]</span></div>
+	<div class="SensorData">Humidity:<br/><span id="HumidityData">[Waiting for value]</span></div>
+	<div class="SensorData"">Magnetometer:<br/><span id="MagnetometerData">[Waiting for value]</span></div>
+	<div class="SensorData">Barometer:<br/><span id="BarometerData">[Waiting for value]</span></div>
+	<div class="SensorData">Gyroscope:<br/><span id="GyroscopeData">[Waiting for value]</span></div>
 
 	<script>
 	function initialiseSensortag()
 	{
 		var sensorTag = TISensorTag.createInstance()
 		sensorTag
+			.statusCallback(statusHandler)
 			.keypressCallback(keypressHandler)
 			.irTemperatureCallback(irTemperatureHandler)
 			.humidityCallback(humidityHandler)
@@ -51,19 +58,24 @@
 			.connectToClosestDevice()
 	}
 
+	function statusHandler(status)
+	{
+		displayValue(
+			'StatusData',
+			status)
+	}
+
 	function keypressHandler(data)
 	{
-		displaySensorValue(
+		displayValue(
 			'KeypressData',
-			'Keypress',
 			data[0])
 	}
 
 	function irTemperatureHandler(data)
 	{
-		displaySensorValue(
+		displayValue(
 			'IRTemperatureData',
-			'IRTemperature',
 			data[0] + ',' + data[1] + ',' + data[2] + ',' + data[3])
 	}
 
@@ -72,48 +84,43 @@
 		//console.log('length: ' + data.length)
 		//console.log('acceldata: ' + data[0] + ' ' + data[1] + ' ' + data[2])
 
-		displaySensorValue(
+		displayValue(
 			'AccelerometerData',
-			'Accelerometer',
 			data[0] + ',' + data[1] + ',' + data[2])
 	}
 
 	function humidityHandler(data)
 	{
-		displaySensorValue(
+		displayValue(
 			'HumidityData',
-			'Humidity',
 			data[0] + ',' + data[1] + ',' + data[2] + ',' + data[3])
 	}
 
 	function magnetometerHandler(data)
 	{
-		displaySensorValue(
+		displayValue(
 			'MagnetometerData',
-			'Magnetometer',
 			data[0] + ',' + data[1] + ',' + data[2])
 	}
 
 	function barometerHandler(data)
 	{
-		displaySensorValue(
+		displayValue(
 			'BarometerData',
-			'Barometer',
 			data[0] + ',' + data[1] + ',' + data[2] + ',' + data[3])
 	}
 
 	function gyroscopeHandler(data)
 	{
-		displaySensorValue(
+		displayValue(
 			'GyroscopeData',
-			'Gyroscope',
 			data[0] + ',' + data[1] + ',' + data[2] + ','
 			+ data[3] + ',' + data[4] + ',' + data[5])
 	}
 
-	function displaySensorValue(elementId, label, value)
+	function displayValue(elementId, value)
 	{
-		document.getElementById(elementId).innerHTML = label + ':<br/>' + value
+		document.getElementById(elementId).innerHTML = value
 	}
 
 	document.addEventListener('deviceready', initialiseSensortag, false)

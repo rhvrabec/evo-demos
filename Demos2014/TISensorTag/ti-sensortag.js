@@ -83,6 +83,22 @@ var TISensorTag = (function()
 		instance.errorFun = function(error)
 		{
 			console.log('SensorTag error: ' + error)
+
+			if ('disconnected' == error)
+			{
+				// Attempt to connect again.
+				setTimeout(
+					function() { instance.connectToClosestDevice() },
+					1000)
+			}
+		}
+
+		/**
+		 * Internal. Default status handler function.
+		 */
+		instance.statusFun = function(status)
+		{
+			console.log('SensorTag status: ' + status)
 		}
 
 		/**
@@ -190,11 +206,22 @@ var TISensorTag = (function()
 		}
 
 		/**
+		 * Public. Set the status handler function.
+		 * @param fun - callback: fun(status)
+		 */
+		instance.statusCallback = function(fun)
+		{
+			instance.statusFun = fun
+
+			return instance
+		}
+
+		/**
 		 * Public. Connect to the closest physical SensorTag device.
 		 */
 		instance.connectToClosestDevice = function()
 		{
-			console.log('Scanning...')
+			instance.statusFun('Scanning')
 			instance.disconnectDevice()
 			easyble.stopScan()
 			easyble.reportDeviceOnce = false
@@ -204,15 +231,11 @@ var TISensorTag = (function()
 			easyble.startScan(
 				function(device)
 				{
-					console.log('Device found: ' + device.name + ' rssi: ' + device.rssi)
-
 					// Connect if we have found a sensor tag.
 					if (sensortag.deviceIsSensorTag(device)
 						&& device.rssi != 127 // Invalid RSSI value
 						)
 					{
-						console.log('SensorTag found')
-
 						if (device.rssi > strongestRSSI)
 						{
 							closestDevice = device
@@ -221,7 +244,7 @@ var TISensorTag = (function()
 
 						if (Date.now() >= stopScanTime)
 						{
-							console.log('Closest SensorTag found')
+							instance.statusFun('SensorTag found')
 							easyble.stopScan()
 							instance.device = closestDevice
 							instance.connectToDevice()
@@ -241,9 +264,12 @@ var TISensorTag = (function()
 		 */
 		instance.connectToDevice = function()
 		{
+			instance.statusFun('Connecting')
 			instance.device.connect(
 				function(device)
 				{
+				instance.statusFun('Connected')
+				instance.statusFun('Reading services')
 					device.readServices(
 						instance.requiredServices,
 						instance.activateSensors,
@@ -271,6 +297,7 @@ var TISensorTag = (function()
 		 */
 		instance.activateSensors = function()
 		{
+			instance.statusFun('Sensors online')
 			instance.irTemperatureOn()
 			instance.accelerometerOn()
 			instance.humidityOn()
