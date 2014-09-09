@@ -1,10 +1,8 @@
 # Developing apps for TI SensorTag made easy
 
-Mikael Kindborg, Evothings AB
-
 ## Quickly develop apps for the TI SensorTag
 
-It can be quite a challenge to program mobile applications for the Internet of Things (IoT) using Bluetooth Low Energy (BLE). By using high-level JavaScript libraries, IoT app development can be made more fun and easy. In this tutorial, we will have a look at a high-level library for the TI SensorTag, a BLE device that features all sorts of sensors. With this library it is easy to write mobile apps in JavaScript and HTML for the SensorTag.
+This demo app shows how to quickly create a mobile app for the TI SensorTag using a high-level JavaScript library. With this library it is easy to write mobile apps in JavaScript and HTML for the SensorTag.
 
 ## The TI SensorTag
 
@@ -165,8 +163,14 @@ Any app you create using Evothings Studio can be packaged as a native Apache Cor
 
 How to build a native app with Cordova is described in the [Evothings Build Documentation](http://evomedia.evothings.com/doc/app-build.html).
 
+## More examples
+
+Magic Stone:
+
+http://evothings.com/magic-stone-make-mobile-iot-applications-using-the-ti-sensortag-in-javascript/
+
 ## Share your projects
 
 Announce your apps and keep the discussion going on the [Evothings Forum](http://forum.evothings.com/).
 
-Evothings Studio is a set of development tools that makes it fun to develop IoT-apps for mobile phones and tablets.
+[Evothings Studio](http://evothings.com/) is a development tool that makes it fun to develop IoT-apps for mobile phones and tablets.
