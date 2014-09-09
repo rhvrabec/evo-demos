@@ -10,7 +10,7 @@ The [Texas Instruments TI SensorTag](http://www.ti.com/ww/en/wireless_connectivi
 
 Photo of the TI SensorTag:
 
-![TI SensorTag](TISensorTag600x400.png)
+![TISensorTag](TISensorTag600x400.png)
 
 There are several ways to develop applications for the SensorTag. Here we will show how to use a high-level JavaScript library, that makes it fast and easy to develop SensorTag apps.
 
@@ -20,7 +20,7 @@ The demo app showcases the TI SensorTag. Coded in JavaScript, the app runs on a 
 
 Screenshot from the app:
 
-![TISensorTag screenshot](TISensorTagScreenshot320x480.jpg)
+![TISensorTag screenshot](TISensorTagScreenshot320x480.png)
 
 ## In the code
 
