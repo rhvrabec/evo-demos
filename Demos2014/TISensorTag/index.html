@@ -11,11 +11,13 @@
 	<link rel="stylesheet" href="common.css" />
 	<style>
 	body {
-		background: rgb(255,25,25);
+		background: rgb(25,25,25);
 		color: rgb(255,255,255);
+		font-size: 220%;
+		padding: 0px 20px;
 	}
 	.SensorData {
-		font-size: 22px;
+		font-size: 120%;
 		font-weight: bold;
 	}
 	.SensorData span {
@@ -43,11 +45,14 @@
 	<div class="SensorData">Gyroscope:<br/><span id="GyroscopeData">[Waiting for value]</span></div>
 
 	<script>
+	// SensorTag object.
+	var sensorTag = TISensorTag.createInstance()
+
 	function initialiseSensortag()
 	{
-		var sensorTag = TISensorTag.createInstance()
 		sensorTag
 			.statusCallback(statusHandler)
+			.errorCallback(errorHandler)
 			.keypressCallback(keypressHandler)
 			.irTemperatureCallback(irTemperatureHandler)
 			.humidityCallback(humidityHandler)
@@ -60,16 +65,34 @@
 
 	function statusHandler(status)
 	{
-		displayValue(
-			'StatusData',
-			status)
+		displayValue('StatusData', status)
+	}
+
+	function errorHandler(error)
+	{
+		displayValue('StatusData', 'Error: ' + error)
+		if ('disconnected' == error)
+		{
+			// If disconneted attempt to connect again.
+			setTimeout(
+				function() { sensorTag.connectToClosestDevice() },
+				1000)
+		}
 	}
 
 	function keypressHandler(data)
 	{
-		displayValue(
-			'KeypressData',
-			data[0])
+		displayValue('KeypressData', data[0])
+
+		if (data[0] == 1)
+		{
+			document.body.style.background = 'red'
+		}
+		else
+		if (data[0] == 2)
+		{
+			document.body.style.background = 'blue'
+		}
 	}
 
 	function irTemperatureHandler(data)

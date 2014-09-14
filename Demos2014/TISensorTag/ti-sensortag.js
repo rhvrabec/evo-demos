@@ -83,14 +83,6 @@ var TISensorTag = (function()
 		instance.errorFun = function(error)
 		{
 			console.log('SensorTag error: ' + error)
-
-			if ('disconnected' == error)
-			{
-				// Attempt to connect again.
-				setTimeout(
-					function() { instance.connectToClosestDevice() },
-					1000)
-			}
 		}
 
 		/**
