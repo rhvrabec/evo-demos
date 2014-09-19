@@ -11,7 +11,7 @@
 	<link rel="stylesheet" href="common.css" />
 	<style>
 	body {
-		background: rgb(25,25,25);
+		background: rgb(200,25,25);
 		color: rgb(255,255,255);
 		font-size: 100%;
 		padding: 0px 20px;
@@ -50,6 +50,13 @@
 
 	function initialiseSensortag()
 	{
+		// Here sensors are set up.
+		// First parameter is the callback function.
+		// Accelerometer, Magnetometer and Gyroscope take a
+		// millisecond update interval as the last parameter.
+		// Gyroscope takes the axes to enable as second parameter:
+		// 1 to enable X axis only, 2 to enable Y axis only, 3 = X and Y,
+		// 4 = Z only, 5 = X and Z, 6 = Y and Z, 7 = X, Y and Z.
 		sensorTag
 			.statusCallback(statusHandler)
 			.errorCallback(errorHandler)
@@ -59,7 +66,7 @@
 			.barometerCallback(barometerHandler)
 			.accelerometerCallback(accelerometerHandler, 100)
 			.magnetometerCallback(magnetometerHandler, 100)
-			.gyroscopeCallback(gyroscopeHandler, 100)
+			.gyroscopeCallback(gyroscopeHandler, 7, 100) // 7 = enable all axes.
 			.connectToClosestDevice()
 	}
 

@@ -8,6 +8,34 @@
 // http://processors.wiki.ti.com/index.php/SensorTag_User_Guide
 // http://processors.wiki.ti.com/index.php/File:BLE_SensorTag_GATT_Server.pdf
 
+// For debugging.
+function LogServices(device)
+{
+	// Here we simply print found services, characteristics,
+	// and descriptors to the debug console in Evothings Workbench.
+
+	// Print all services.
+	for (var serviceUUID in device.__services)
+	{
+		var service = device.__services[serviceUUID]
+		console.log('  service: ' + service.uuid)
+
+		// Print all characteristics for service.
+		for (var characteristicUUID in service.__characteristics)
+		{
+			var characteristic = service.__characteristics[characteristicUUID]
+			console.log('    characteristic: ' + characteristic.uuid)
+
+			// Print all descriptors for characteristic.
+			for (var descriptorUUID in characteristic.__descriptors)
+			{
+				var descriptor = characteristic.__descriptors[descriptorUUID]
+				console.log('      descriptor: ' + descriptor.uuid)
+			}
+		}
+	}
+}
+
 var TISensorTag = (function()
 {
 	var sensortag = {}
@@ -41,15 +69,13 @@ var TISensorTag = (function()
 
 	sensortag.GYROSCOPE_SERVICE = 'f000aa50-0451-4000-b000-000000000000'
 	sensortag.GYROSCOPE_CONFIG = 'f000aa52-0451-4000-b000-000000000000'
-	// Not working: sensortag.GYROSCOPE_PERIOD = 'f000aa53-0451-4000-b000-000000000000'
+	sensortag.GYROSCOPE_PERIOD = 'f000aa53-0451-4000-b000-000000000000'
 	sensortag.GYROSCOPE_DATA = 'f000aa51-0451-4000-b000-000000000000'
 	sensortag.GYROSCOPE_NOTIFICATION = '00002902-0000-1000-8000-00805f9b34fb'
 
 	sensortag.KEYPRESS_SERVICE = '0000ffe0-0000-1000-8000-00805f9b34fb'
 	sensortag.KEYPRESS_DATA = '0000ffe1-0000-1000-8000-00805f9b34fb'
 	sensortag.KEYPRESS_NOTIFICATION = '00002902-0000-1000-8000-00805f9b34fb'
-
-	// TODO: Upgrade firmware and test if missing period characteristics are present.
 
 	/**
 	 * Internal. Override if needed.
@@ -163,11 +189,15 @@ var TISensorTag = (function()
 		/**
 		 * Public. Set the gyroscope notification callback.
 		 * @param fun - success callback called repeatedly: fun(data)
-		 * @param interval - accelerometer rate in milliseconds.
+		 * @param axes - the axes to enable, 1 to enable X axis only,
+		 * 2 to enable Y axis only, 3 = X and Y, 4 = Z only,
+		 * 5 = X and Z, 6 = Y and Z, 7 = X, Y and Z.
+		 * @param interval - gyroscope rate in milliseconds.
 		 */
-		instance.gyroscopeCallback = function(fun, interval)
+		instance.gyroscopeCallback = function(fun, axes, interval)
 		{
 			instance.gyroscopeFun = fun
+			instance.gyroscopeAxes = axes
 			instance.gyroscopeInterval = interval
 			instance.requiredServices.push(sensortag.GYROSCOPE_SERVICE)
 
@@ -289,6 +319,11 @@ var TISensorTag = (function()
 		 */
 		instance.activateSensors = function()
 		{
+			// Debug logging.
+			//console.log('-------------------- SERVICES --------------------')
+			//LogServices(instance.device)
+			//console.log('---------------------- END -----------------------')
+
 			instance.statusFun('Sensors online')
 			instance.irTemperatureOn()
 			instance.accelerometerOn()
@@ -306,6 +341,7 @@ var TISensorTag = (function()
 		{
 			instance.sensorOn(
 				sensortag.IRTEMPERATURE_CONFIG,
+				1, // Sensor on.
 				null, // Not used.
 				null, // Not used.
 				sensortag.IRTEMPERATURE_DATA,
@@ -332,6 +368,7 @@ var TISensorTag = (function()
 		{
 			instance.sensorOn(
 				sensortag.ACCELEROMETER_CONFIG,
+				1, // Sensor on.
 				sensortag.ACCELEROMETER_PERIOD,
 				instance.accelerometerInterval,
 				sensortag.ACCELEROMETER_DATA,
@@ -358,6 +395,7 @@ var TISensorTag = (function()
 		{
 			instance.sensorOn(
 				sensortag.HUMIDITY_CONFIG,
+				1, // Sensor on.
 				null, // Not used.
 				null, // Not used.
 				sensortag.HUMIDITY_DATA,
@@ -384,6 +422,7 @@ var TISensorTag = (function()
 		{
 			instance.sensorOn(
 				sensortag.MAGNETOMETER_CONFIG,
+				1, // Sensor on.
 				sensortag.MAGNETOMETER_PERIOD,
 				instance.magnetometerInterval,
 				sensortag.MAGNETOMETER_DATA,
@@ -410,6 +449,7 @@ var TISensorTag = (function()
 		{
 			instance.sensorOn(
 				sensortag.BAROMETER_CONFIG,
+				1, // Sensor on.
 				null, // Not used.
 				null, // Not used.
 				sensortag.BAROMETER_DATA,
@@ -436,6 +476,7 @@ var TISensorTag = (function()
 		{
 			instance.sensorOn(
 				sensortag.GYROSCOPE_CONFIG,
+				instance.gyroscopeAxes,
 				sensortag.GYROSCOPE_PERIOD,
 				instance.gyroscopeInterval,
 				sensortag.GYROSCOPE_DATA,
@@ -464,6 +505,7 @@ var TISensorTag = (function()
 				null, // Not used.
 				null, // Not used.
 				null, // Not used.
+				null, // Not used.
 				sensortag.KEYPRESS_DATA,
 				sensortag.KEYPRESS_NOTIFICATION,
 				instance.keypressFun)
@@ -482,10 +524,13 @@ var TISensorTag = (function()
 		}
 
 		/**
-		 * Private. Helper function for turning on sensor notification.
+		 * Private/public. Helper function for turning on sensor notification.
+		 * You can call this function from the application to enables sensors
+		 * using custom parameters (advanced use).
 		 */
 		instance.sensorOn = function(
 			configUUID,
+			configValue,
 			periodUUID,
 			periodValue,
 			dataUUID,
@@ -498,7 +543,7 @@ var TISensorTag = (function()
 			// Set sensor configuration to ON.
 			configUUID && instance.device.writeCharacteristic(
 				configUUID,
-				new Uint8Array([1]),
+				new Uint8Array([configValue]),
 				function() {},
 				instance.errorFun)
 
