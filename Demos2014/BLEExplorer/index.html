@@ -56,7 +56,7 @@
 		console.log('Device found: ' + device.name + ' rssi: ' + device.rssi)
 
 		// THIS IS WHERE YOU EDIT THE NAME OF THE BLE DEVICE TO CONNECT TO!
-		var myDeviceName = 'StickNfind' //'TI BLE Sensor Tag'
+		var myDeviceName = 'TI BLE Sensor Tag'
 
 		// Connect if name matches.
 		if (device.name == myDeviceName)
@@ -71,13 +71,22 @@
 	{
 		console.log('Connected to device: ' + device.name)
 		console.log('Reading services... Have patience!')
-		device.readServices(null, readServicesComplete, readServicesError)
+		device.readServices(
+			null, // null means "read all services".
+			readAllServicesCharacteristicsAndNotifications,
+			readServicesError)
 	}
 
-	function readServicesComplete(device)
+	// Function that gets called when reading device.readServices()
+	// has successfully completed.
+	function readAllServicesCharacteristicsAndNotifications(device)
 	{
 		// Here we simply print found services, characteristics,
 		// and descriptors to the debug console in Evothings Workbench.
+
+		// Notice that the fields prefixed with "__" are arrays that
+		// contain services, characteristics and notifications found
+		// in the call to device.readServices().
 
 		// Print all services.
 		for (var serviceUUID in device.__services)

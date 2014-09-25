@@ -1,8 +1,6 @@
 # BLE Explorer
 
-Example program that connects to a BLE device and lists services, characteristics and descriptors.
-
-The purpose is to provide some basic code as a starting point for learning, tinkering and experimenting.
+BLE Explorer is an example program that connects to a BLE device and lists services, characteristics and descriptors. The purpose is to provide some basic code as a starting point for learning, tinkering and experimenting.
 
 This is not a ready to use app, rather it is meant to be run from Evothings Workbench, inspecting the output log in the "Tools" Window.
 
@@ -29,33 +27,27 @@ To connect to a BLE device, you first scan for BLE devices, then connect to the 
 * When connected scan for services, characteristics, descriptors.
 * Write and/or read the characteristics you wish to use. Enable any notifications you will use.
 
-The example app "BLE Scan" in Evothings Studio is a good starting point for learning how to scan for devices. There is currently a bug in this example that causes problems on Android - the function app.stopScan in file app.js should be like this:
-
-	// Stop scanning for devices.
-	app.stopScan = function()
-	{
-	    evothings.ble.stopScan();
-	};
-
 ## Running the BLE Explorer app using Evothings Studio
 
-The BLE Explorer app is meant to be run using [**Evothings Studio**](http://evothings.com/download). It should be noted that it is just a Cordova app runnint inside the Evothings Client container app. You can build a native BLE Explorer app using Cordova.
+The BLE Explorer app is meant to be run using [**Evothings Studio**](http://evothings.com/download).
 
 When developing apps with Evothings Studio, you run the Evothings Client app on your mobile device to execute the application, and you use Evothings Workbench on your laptop/desktop machine, running a live-reload server.
+
+There are comments in the source code, in file [index.html](https://github.com/divineprog/evo-demos/tree/master/Demos2014/BLEExplorer/index.html), that guides you through the code.
 
 To run the app, do as follows:
 
 * Install the **Evothings Client** app on your iOS or Android device (available in the AppStore and on Google Play).
-* [Download Evothings Studio](http://evothings.com/download).
+* [Download Evothings Studio](http://evothings.com/download) and launch Evothings Workbench on your computer.
 * Grab the [source code for the BLE Explorer app](https://github.com/divineprog/evo-demos/tree/master/Demos2014/BLEExplorer) from GitHub.
-* Drag and drop index.html into the Evothings Workbench running on your computer.
+* Drag and drop <b>index.html</b> into the Evothings Workbench project window.
 * Open the Tools window in the Workbench by pressing "Tools" (this is where console output will display).
-* Activate a BLE device to scan for.
-* Connect from Evothings Client to the Workbench.
-* Press Run in the Workbench project list.
-* Inspect the result in the Tools window, name of active BLE devices should appear, if you see none, press Run again.
-* Open file index.html in a text editor and update the line **var myDeviceName = 'StickNfind'** to have the name of the BLE device you want to connect to, then save the file (app reloads automatically when you save the code).
-* Inspect the result in the Tools window, if successful you should now connect to a device and see its data.
+* Check that the BLE device you want to scan for is active/powered on.
+* Launch the Evothings Client app and connect to the Workbench.
+* Press Run in the Workbench project list window.
+* Inspect the result in the Tools window, the name of active BLE devices should appear, if you see none, press Run again.
+* Open file index.html in a text editor and update the line<br/>**var myDeviceName = 'TI BLE Sensor Tag'**<br/>to have the name of the BLE device you want to connect to, then save the file (app reloads automatically when you save the code).
+* Inspect the result in the Tools window, if successful the program should now connect to the device and print its data.
 
 ## Using BLE from JavaScript
 
