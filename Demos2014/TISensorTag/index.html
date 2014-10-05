@@ -64,9 +64,9 @@
 			.irTemperatureCallback(irTemperatureHandler)
 			.humidityCallback(humidityHandler)
 			.barometerCallback(barometerHandler)
-			.accelerometerCallback(accelerometerHandler, 100)
-			.magnetometerCallback(magnetometerHandler, 100)
-			.gyroscopeCallback(gyroscopeHandler, 7, 100) // 7 = enable all axes.
+			.accelerometerCallback(accelerometerHandler, 200)
+			.magnetometerCallback(magnetometerHandler, 200)
+			.gyroscopeCallback(gyroscopeHandler, 7, 200) // 7 = enable all axes.
 			.connectToClosestDevice()
 	}
 
@@ -106,7 +106,7 @@
 	{
 		displayValue(
 			'IRTemperatureData',
-			data[0] + ',' + data[1] + ',' + data[2] + ',' + data[3])
+			data[0] + ',' + data[1] + ',' + data[2] +  ',' + data[3])
 	}
 
 	function accelerometerHandler(data)
@@ -114,9 +114,13 @@
 		//console.log('length: ' + data.length)
 		//console.log('acceldata: ' + data[0] + ' ' + data[1] + ' ' + data[2])
 
+		var x = data[0] / 16
+		var y = data[1] / 16
+		var z = data[2] / 16
+		var g = Math.sqrt((x*x)+(y*y)+(z*z))
 		displayValue(
 			'AccelerometerData',
-			data[0] + ',' + data[1] + ',' + data[2])
+			'x = ' + x + '<br/>y = ' + y + '<br/>z = ' + z + '<br/>g = ' + g)
 	}
 
 	function humidityHandler(data)
