@@ -243,10 +243,10 @@ var TISensorTag = (function()
 		 */
 		instance.connectToClosestDevice = function()
 		{
-			instance.statusFun('Scanning')
+			instance.statusFun('Scanning...')
 			instance.disconnectDevice()
 			easyble.stopScan()
-			easyble.reportDeviceOnce = false
+			easyble.reportDeviceOnce(false)
 			var stopScanTime = Date.now() + 2000
 			var closestDevice = null
 			var strongestRSSI = -1000
@@ -286,12 +286,12 @@ var TISensorTag = (function()
 		 */
 		instance.connectToDevice = function()
 		{
-			instance.statusFun('Connecting')
+			instance.statusFun('Connecting...')
 			instance.device.connect(
 				function(device)
 				{
 				instance.statusFun('Connected')
-				instance.statusFun('Reading services')
+				instance.statusFun('Reading services...')
 					device.readServices(
 						instance.requiredServices,
 						instance.activateSensors,

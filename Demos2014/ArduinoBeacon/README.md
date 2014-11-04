@@ -59,7 +59,7 @@ void loop()
 
 <h2>How the mobile app works</h2>
 
-The mobile app that monitors beacons is developed in HTML and JavaScript using Evothings Studio. The app will run in the Evothings Client app. As the final step, we will host the code on a web server, so that the visitors of the place where we have placed the beacons can easily run the app. (Note that <a href="http://evomedia.evothings.com/doc/apps-build-overview.html">you can also make a native app</a> and publish it on the app stores.)
+The mobile app that monitors beacons is developed in HTML and JavaScript using Evothings Studio. The app will run in the Evothings Client app. As the final step, we will host the code on a web server, so that the visitors of the place where we have placed the beacons can easily run the app. (Note that <a href="http://evothings.com/doc/build/build-overview.html">you can also make a native app</a> and publish it on the app stores.)
 
 The app continuously scans for advertising BLE devices, then determine which are our beacons, and shows the information page associated with the beacons that is closest. If no beacon is within range, a default info page will be shown. The range of BLE signals is about 10 to 30 meters.
 
@@ -164,7 +164,7 @@ Also note that all the cordova.js files (including ble.js) are already in the Ev
 
 This tutorial was meant to introduce the concept of "Do-It-Yourself" beacons, which works differently from Apple's iBeacons. While both DIY beacons and iBeacons build on the same technology, there are some twists to iBeacons, covered in <a href="http://www.mutualmobile.com/posts/ibeacons-lessons-learned">this blogpost by Sean McMains at mutualmobile</a>.
 
-Evothings Client includes a <a href="https://github.com/petermetz/cordova-plugin-ibeacon">Cordova iBeacon plugin</a>, that you can use to develop apps for Apple's iBeacon technology. See the <a href="http://evomedia.evothings.com/doc/ibeacon-scan.html">iBeacon Scan example app</a> that comes with Evothings Studio.
+Evothings Client includes a <a href="https://github.com/petermetz/cordova-plugin-ibeacon">Cordova iBeacon plugin</a>, that you can use to develop apps for Apple's iBeacon technology. See the <a href="http://evothings.com/doc/examples/ibeacon-scan.html">iBeacon Scan example app</a> that comes with Evothings Studio.
 
 Please feel free to drop in on the <a href="http://forum.evothings.com/">Evothings Forum</a>, to discuss technology, applications, ask questions, and share experiences.
 

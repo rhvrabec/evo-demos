@@ -148,5 +148,5 @@ Note that you can try out the example even if you have only one iBeacon. In this
 
 You can create your own iBeacon using a computer that supports BLE. For example, here is [how to turn a Raspberry Pi into an iBeacon](http://www.theregister.co.uk/2013/11/29/feature_diy_apple_ibeacons/). For a specification of the iBeacon advertisement format, see for instance [here](http://en.wikipedia.org/wiki/IBeacon) and [here](http://stackoverflow.com/questions/18906988/what-is-the-ibeacon-bluetooth-profile).
 
-To create a native app, follow the [build instructions](http://evomedia.evothings.com/doc/apps-build-overview.html) in the Evothings Studio documentation.
+To create a native app, follow the [build instructions](http://evothings.com/doc/build/build-overview.html) in the Evothings Studio documentation.
 -->

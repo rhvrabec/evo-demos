@@ -21,7 +21,7 @@ var easyble = (function()
 	 * Set to true to report found devices only once,
 	 * set to false to report continuously.
 	 */
-	easyble.reportDeviceOnce = true
+	var reportDeviceOnce = false;
 
 	/** Internal properties and functions. */
 	var internal = {};
@@ -35,6 +35,15 @@ var easyble = (function()
 	/** Table of connected devices. */
 	internal.connectedDevices = {};
 
+	/**
+	 * Set to true to report found devices only once,
+	 * set to false to report continuously.
+	 */
+	easyble.reportDeviceOnce = function(reportOnce)
+	{
+		reportDeviceOnce = reportOnce;
+	};
+
 	/** Start scanning for devices. */
 	easyble.startScan = function(win, fail)
 	{
@@ -46,14 +55,17 @@ var easyble = (function()
 			var existingDevice = internal.knownDevices[device.address]
 			if (existingDevice)
 			{
-				if (easyble.reportDeviceOnce) { return; }
+				// Do not report device again if flag is set.
+				if (reportDeviceOnce) { return; }
+
+				// Flag not set, report device again.
 				existingDevice.rssi = device.rssi;
 				existingDevice.name = device.name;
 				win(existingDevice);
 				return;
 			}
 
-			// Add the device to known devices, so that we do not handle it again.
+			// New device, add to known devices.
 			internal.knownDevices[device.address] = device;
 
 			// Add methods to the device info object.
@@ -176,7 +188,7 @@ var easyble = (function()
 				// Additional callback? (connect, disconnect, fail)
 				// Additional parameter on win callback with connect state?
 				// (Last one is the best option I think).
-				fail('disconnected');
+				fail && fail('disconnected');
 			}
 		},
 		function(errorCode)
@@ -463,6 +475,11 @@ var easyble = (function()
 			}
 		}
 		print(obj, 0);
+	};
+
+	easyble.reset = function()
+	{
+		evothings.ble.reset();
 	};
 
 	return easyble;

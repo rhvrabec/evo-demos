@@ -134,7 +134,7 @@ To run the app, do as follows:
 * Install the **Evothings Client** app on your iOS or Android device (available in the AppStore and on Google Play)
 * [Download Evothings Studio](http://evothings.com/download)
 * Grab the [source code for the TI SensorTag app](https://github.com/divineprog/evo-demos/tree/master/Demos2014/TISensorTag) from GitHub
-* Drag and drop index.html into the Evothings Workbench running on your computer
+* Drag and drop index.html anywhere in the project list window in the Evothings Workbench application running on your computer
 * Connect from Evothings Client to the Workbench
 * Press Run in the Workbench
 * Make sure the SensorTag is in announce mode
@@ -161,7 +161,7 @@ The documentation for the UUIDs used by SensorTag services and characteristics i
 
 Any app you create using Evothings Studio can be packaged as a native Apache Cordova app, that can then be published on the app stores. The Evothings Client app itself is a Cordova app, and it was even developed using Evothings Workbench!
 
-How to build a native app with Cordova is described in the [Evothings Build Documentation](http://evomedia.evothings.com/doc/app-build.html).
+How to build a native app with Cordova is described in the [Evothings Build Documentation](http://evothings.com/doc/build/build-overview.html).
 
 ## More examples
 
