@@ -1,0 +1,14 @@
+<ion-view view-title="Beacons">
+	<ion-content>
+		<ion-list>
+			<ion-item class="item-thumbnail-left item-icon-right" ng-repeat="beacon in beacons" type="item-text-wrap" href="#/tab/beacons/{{beacon.id}}">
+				<img ng-src="{{beacon.image}}">
+				<h2 style="font-size:150%;">{{beacon.title}}</h2>
+				<h3 style="font-size:120%;">Distance: {{beacon.distance}} meters</h3>
+				<!-- For finding out the major/minor id of the beacon -->
+				<h3 style="font-size:120%;">{{beacon.id}}</h3>
+				<i class="icon ion-chevron-right icon-accessory"></i>
+			</ion-item>
+		</ion-list>
+	</ion-content>
+</ion-view>

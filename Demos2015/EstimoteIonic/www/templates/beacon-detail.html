@@ -1,0 +1,12 @@
+<!--
+This template loads for the 'tab.beacon-detail' state (app.js)
+'beacon' is a $scope variable created in the BeaconsCtrl controller (controllers.js)
+BeaconsCtrl has a callback that gets notified by the Beacons service
+when beacons are ranged (service.js)
+-->
+<ion-view view-title="{{beacon.title}}">
+	<ion-content class="padding">
+		<img ng-src="{{beacon.image}}" style="width:100%; height:auto;">
+		<h3>{{beacon.description}}</h3>
+	</ion-content>
+</ion-view>
