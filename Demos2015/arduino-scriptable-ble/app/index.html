@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<!--
+This app demonstrates how to read analog input from the Arduio
+using BLE.
+
+To use this example, hook up some analog input to your Arduino
+sketch, for example a potentiomenter. In the code below analog
+input pin 0 is used.
+
+The library evothings.arduinoble in file arduinoble.js contains
+functions for writing and reading digital pins that you can
+experiment with.
+-->
+<head>
+
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no
+		initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+
+	<title>Arduino Input BLE</title>
+
+	<style>
+		@import 'ui/css/evothings-app.css';
+	</style>
+
+	<script>
+	// Redirect console.log to Evothings Workbench.
+	if (window.hyper && window.hyper.log) { console.log = hyper.log }
+	</script>
+
+	<script src="cordova.js"></script>
+	<script src="libs/jquery/jquery.js"></script>
+	<script src="libs/evothings/evothings.js"></script>
+	<script src="libs/evothings/arduinoble/arduinoble.js"></script>
+
+</head>
+
+<body ontouchstart=""><!-- ontouchstart="" enables low-delay CSS transitions. -->
+
+	<header>
+		<button class="back" onclick="history.back()">
+			<img src="ui/images/arrow-left.svg" />
+		</button>
+
+		<img class="logotype" src="ui/images/logo.svg" alt="Evothings" />
+
+		<!--<button class="menu" onclick=""><img src="ui/images/menu.svg" /></button>-->
+	</header>
+
+	<h1>Arduino Input BLE</h1>
+
+	<button class="green" onclick="app.connect()">CONNECT</button>
+	<button class="charcoal" onclick="app.disconnect()">DISCONNECT</button>
+
+	<br />
+
+	<p>Status: <span id="ArduinoStatus">Not connected</span></p>
+
+	<div id="ArduinoAnalogValue" style="background:rgb(0,255,0);height:20px;width:1%"></div>
+
+	<p>Instructions for how to use this example is provided in the source code of file index.html</p>
+
+	<script>
+	// Short name for Arduino BLE library.
+	var arduino = evothings.arduinoble
+
+	// Application object.
+	var app = {}
+
+	// Pin for analog input (modify if needed to suit your sketch).
+	app.analogInputPin = 0
+
+	// Arduino BLE name (modify if needed to suit your sketch).
+	app.arduinoName = 'ArduinoBLE'
+
+	// Handle analog read.
+	app.analogRead = function(value)
+	{
+		// Display value in input field.
+		$('#ArduinoStatus').html('Analog value of pin is: ' + value)
+
+		// Convert analog value to percent value between 1 and 100.
+		var width = (value / 1024) * 100
+		width = Math.max(1, width)
+		width = Math.min(100, width)
+		$('#ArduinoAnalogValue').css('width', width + '%')
+	}
+
+	app.connect = function()
+	{
+		arduino.connect(
+			app.arduinoName,
+			function()
+			{
+				// Display status message.
+				$('#ArduinoStatus').html('Connected to the Arduino')
+
+				// Start analog read.
+				arduino.startAnalogRead(
+					app.analogInputPin,
+					app.analogRead,
+					function(error) {
+						$('#ArduinoStatus').html('Read error: ' + error)
+					})
+			},
+			function(error)
+			{
+				$('#ArduinoStatus').html('Connection error: ' + error)
+			})
+	}
+
+	app.disconnect = function()
+	{
+		arduino.disconnect ()
+		$('#ArduinoStatus').html('Disconnected')
+	}
+	</script>
+
+</body>
+
+</html>
