@@ -18,7 +18,7 @@ You can just copy and add connect.html to your own Cordova project to make it ea
 
 Here are the steps to connect to Evothings Workbench and run the index.html file in this project:
 
-* First download Evothings Workbench, it is included with the [http://evothings.com/download/](Evothings Studio download).
+* First download Evothings Workbench, it is included with the [Evothings Studio download](http://evothings.com/download/).
 
 * Enter the Connect URL displayed Evothings Workbench in the address field in the app and tap the Connect button (you will find the Connect URL in the bottom panel of the Evothings Workbench project window).
 
@@ -32,7 +32,7 @@ Here are the steps to connect to Evothings Workbench and run the index.html file
 
 If you are new to Cordova, here is how to build this app:
 
-* Install Cordova using the (Evothings Cordova step-by-step guides)[http://evothings.com/doc/build/build-overview.html].
+* Install Cordova using the [Evothings Cordova step-by-step guides](http://evothings.com/doc/build/build-overview.html).
 
 * Get the files for the app from GitHub.
 
@@ -61,8 +61,8 @@ To learn more read these articles and tutorials:
 
 * [Setup Cordova for Evothings Workbench](http://evothings.com/doc/build/cordova-guide.html#SetupCordovaForEvothings)
 
-* [Cordova IoT Starter Kit](http://evothings.com/cordova-starter-kit/]
+* [Cordova IoT Starter Kit](http://evothings.com/cordova-starter-kit/)
 
-* [Hybrid app development made fast](http://evothings.com/hybrid-app-development-made-fast/])
+* [Hybrid app development made fast](http://evothings.com/hybrid-app-development-made-fast/)
 
-* [Evothings Starter Kit](http://evothings.com/evothings-starter-kit/)
+* [Evothings Studio Starter Kit](http://evothings.com/evothings-studio-starter-kit/)
