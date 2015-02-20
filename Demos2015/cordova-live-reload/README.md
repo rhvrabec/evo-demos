@@ -1,6 +1,6 @@
 # Cordova Live Reload
 
-Use Evothings Workbench to get live reload and develop your Cordova app with a fast workflow.
+Use [Evothings Workbench](http://evothings.com/doc/studio/workbench.html]) to get live reload and develop your Cordova app with a fast workflow.
 
 ## Use connect.html to quickly develop your Cordova app
 
@@ -8,7 +8,7 @@ This is a standard Cordova app generated with cordova create. Use it in place of
 
 Two modifications have been made to the project:
 
-* The file [www/connect.html](connect.html) file has been added. This file is completely self contained, there are no dependencies on external libraries or style sheets.
+* The file [www/connect.html](www/connect.html) file has been added. This file is completely self contained, there are no dependencies on external libraries or style sheets.
 
 * The entry &lt;content src="connect.html"/&gt; has been added to [config.xml](config.xml).
 
@@ -50,7 +50,7 @@ The generated APK-file is located in folder "platforms/android/ant-build".
 
 When using Evothings Workbench you don't need to rebuild using Cordova. When you want to rebuild the native app, do these steps:
 
-* Edit config.xml to use &lt;content src="index.html"/&gt;
+* Edit config.xml to use: <pre>&lt;content src="index.html"/&gt;</pre>
 
 * Rebuild the project using: <pre>cordova build ios
 cordova build android</pre>
@@ -59,10 +59,10 @@ cordova build android</pre>
 
 To learn more read these articles and tutorials:
 
-* [http://evothings.com/doc/build/cordova-guide.html#SetupCordovaForEvothings](Setup Cordova for Evothings Workbench)
+* [Setup Cordova for Evothings Workbench](http://evothings.com/doc/build/cordova-guide.html#SetupCordovaForEvothings)
 
-* [http://evothings.com/cordova-starter-kit/}(Cordova IoT Starter Kit)
+* [Cordova IoT Starter Kit](http://evothings.com/cordova-starter-kit/]
 
-* [http://evothings.com/hybrid-app-development-made-fast/](Hybrid app development made fast)
+* [Hybrid app development made fast](http://evothings.com/hybrid-app-development-made-fast/])
 
-* [http://evothings.com/evothings-starter-kit/](Evothings Starter Kit)
+* [Evothings Starter Kit](http://evothings.com/evothings-starter-kit/)
