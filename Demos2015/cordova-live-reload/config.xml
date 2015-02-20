@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.kindborg.cordovalive" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>CordovaLive</name>
+    <description>
+        A sample Apache Cordova application that connects to Evothings Workbench. This makes it possible to develop a Cordova app using live reload on save, and use the JavaScript Tools window in the Workbench.
+    </description>
+    <author email="mikael.kindborg@evothings.com" href="https://github.com/divineprog/">
+        Mikael Kindborg
+    </author>
+    <!-- Edit the content entry to use "index.html" when ready to test/ship the app -->
+    <content src="connect.html" />
+    <access origin="*" />
+</widget>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<!--
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="msapplication-tap-highlight" content="no" />
+        <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+        <!--<link rel="stylesheet" type="text/css" href="css/index.css" />-->
+        <title>Cordova Live Reload</title>
+    </head>
+    <body>
+    	<style>
+    	html, body
+    	{
+    		font-size: 24px;
+    		font-family: sans-serif;
+    		margin: 0px;
+    		padding: 0px;
+    	}
+    	.content
+    	{
+    		margin: 1em;
+    	}
+    	.header h1
+    	{
+    		text-align: center;
+    		font-size: 2em;
+    		color: white;
+			background: rgb(50,50,50);
+			font-weight: bold;
+			margin: 0px;
+			padding: 0.4em;
+
+    	}
+    	input
+    	{
+    		display: block;
+    		font-size: 1.2em;
+			border-radius: 0em;
+			width: 100%;
+    		box-sizing: border-box;
+    	}
+    	button
+    	{
+    		display: block;
+			font-weight: bold;
+			border: 0px;
+			border-radius: 0em;
+			color: white;
+			width: 100%;
+    		box-sizing: border-box;
+
+    	}
+    	button.button-big
+    	{
+    		font-size: 1.2em;
+			padding: 0.4em 1em;
+			background-color: rgb(250,0,100);
+
+    	}
+    	button.button-small
+    	{
+    		text-align: left;
+    		font-size: 0.9em;
+			padding: 0.4em 1em;
+			background-color: rgb(250,100,0);
+    	}
+    	.spacer
+    	{
+    		width: 100%;
+    		height: 0.3em;
+    	}
+    	</style>
+
+		<div class="header">
+			<h1>Cordova Live Reload</h1>
+		</div>
+		<div class="content">
+			<input id="cordovalive-connect-url" type="url" class="connect-address" />
+			<div class="spacer"></div>
+			<button class="button-big"
+				ontouchend="cordovalive.connectToEvothingsWorkbench()">
+				Connect
+			</button>
+			<p>
+				Use Evothings Workbench to get live reload and develop your
+				Cordova app with a fast workflow.
+			</p>
+			<p>
+				This is a standard Cordova app generated with cordova create.
+				One file has been added to the project, connect.html, which
+				is this file. The entry <code>&lt;content src="connect.html"/&gt;</code>
+				has been added to the config.xml file.
+			</p>
+			<p>
+				You can add this file (connect.html) to your own Cordova project to
+				make it easy to connect to Evothings Workbench. When ready to test/ship
+				the app, edit the Cordova config.xml to use
+				<code>&lt;content src="index.html"/&gt;</code>
+			</p>
+			<p>
+				Here are the steps to connect to Evothings Workbench and run
+				the index.html file in this project:
+			</p>
+			<ol>
+				<li>Enter the Connect URL displayed in the Workbench window
+				in the address field above and tap the Connect button.</li>
+				<li>Drag index.html to the Workbench project list.</li>
+				<li>Click RUN in the Workbench window. You now have live reload
+				enabled, just save the code in your editor and the app reloads.</li>
+			</ol>
+			<p>
+				Make sure your computer and phone/tablet are on a WiFi network
+				that allows connections (client isolation must be off).
+			</p>
+
+			<p>To learn more read these articles and tutorials:</p>
+
+			<button class="button-small" ontouchend="window.open('http://evothings.com/doc/build/cordova-guide.html#SetupCordovaForEvothings', '_system')">
+				Setup Cordova for Evothings Workbench
+			</button>
+			<div class="spacer"></div>
+			<button class="button-small" ontouchend="window.open('http://evothings.com/cordova-starter-kit/', '_system')">
+				Cordova IoT Starter Kit
+			</button>
+			<div class="spacer"></div>
+			<button class="button-small" ontouchend="window.open('http://evothings.com/hybrid-app-development-made-fast/', '_system')">
+				Hybrid app development made fast
+			</button>
+			<div class="spacer"></div>
+			<button class="button-small" ontouchend="window.open('http://evothings.com/evothings-starter-kit/', '_system')">
+				Evothings Starter Kit
+			</button>
+		</div>
+
+        <script type="text/javascript" src="cordova.js"></script>
+        <script>
+        var cordovalive = {}
+
+		cordovalive.getInputElement = function()
+		{
+			return document.getElementById('cordovalive-connect-url')
+		}
+
+		cordovalive.showSavedConnectAddress = function()
+		{
+			cordovalive.getInputElement().value =
+				localStorage.getItem('cordovalive-connect-url')
+				|| '192.168.0.x'
+		}
+
+		// Add protocol and port if needed.
+		cordovalive.parseConnectAddress = function(address)
+		{
+			var url = address.trim();
+
+			if (!url.match('^https?://[A-Z0-9\.]*.*$'))
+			{
+				// Add protocol.
+				url = 'http://' + url
+			}
+
+			if (url.match('^https?://[0-9\.]*$') &&
+				!url.match('^https?://[0-9\.]*:[0-9]*$'))
+			{
+				// Add port to numeric ip address.
+				url = url + ':4042';
+			}
+
+			return url
+		}
+
+		cordovalive.connectToEvothingsWorkbench = function()
+		{
+			// Get contents of url text field.
+			var address = cordovalive.getInputElement().value
+
+			// Add protocol and port if needed.
+			var url = cordovalive.parseConnectAddress(address)
+
+			// Save the URL.
+			localStorage.setItem('cordovalive-connect-url', url)
+
+			// Open URL.
+			window.location.assign(url)
+		}
+
+		// Show last used connect address.
+		cordovalive.showSavedConnectAddress()
+        </script>
+    </body>
+</html>
