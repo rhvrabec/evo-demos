@@ -29,10 +29,8 @@
 	</style>
 	<script>
 	// Redirect console.log to Evothings Workbench.
-	if (window.hyper) { console.log = hyper.log; }
+	if (window.hyper && window.hyper.log) { console.log = hyper.log; }
 	</script>
-	<script src="cordova.js"></script>
-	<script src="easy-ble.js"></script>
 </head>
 <body>
 	<h1>BLE Explorer</h1>
@@ -43,12 +41,15 @@
 
 	<p>Use this example by experimenting with the JavaScript source code. Note that you will need to edit the name of the BLE device you wish to connect to in the code.</p>
 
+	<script src="cordova.js"></script>
+	<script src="libs/evothings/evothings.js"></script>
+	<script src="libs/evothings/easyble/easyble.js"></script>
 	<script>
 	function init()
 	{
 		console.log('Scanning for devices...')
-		easyble.reportDeviceOnce = true
-		easyble.startScan(deviceDetected, scanError)
+		evothings.easyble.reportDeviceOnce(true)
+		evothings.easyble.startScan(deviceDetected, scanError)
 	}
 
 	function deviceDetected(device)
@@ -56,12 +57,14 @@
 		console.log('Device found: ' + device.name + ' rssi: ' + device.rssi)
 
 		// THIS IS WHERE YOU EDIT THE NAME OF THE BLE DEVICE TO CONNECT TO!
-		var myDeviceName = 'TI BLE Sensor Tag'
+		var myDeviceName = 'estimote'
 
 		// Connect if name matches.
 		if (device.name == myDeviceName)
 		{
-			easyble.stopScan()
+			evothings.easyble.stopScan()
+			console.log('Advertisement data')
+			evothings.easyble.printObject(device.advertisementData, console.log)
 			console.log('Connecting')
 			device.connect(deviceConnected, connectError)
 		}
