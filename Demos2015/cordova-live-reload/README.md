@@ -1,6 +1,6 @@
 # Cordova Live Reload
 
-Use [Evothings Workbench](http://evothings.com/doc/studio/workbench.html]) to get live reload and develop your Cordova app with a fast workflow.
+Use [Evothings Workbench](http://evothings.com/doc/studio/workbench.html) to get live reload and develop your Cordova app with a fast workflow.
 
 ## Use connect.html to quickly develop your Cordova app
 
