@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="pragma" content="no-cache" />
+	<meta http-equiv="expires" content="-1" />
+	<meta name="viewport" content="width=device-width" />
+
+	<title>EasyBLE Demo</title>
+
+	<style>
+	body {
+		font-family: sans-serif;
+		font-size: 120%;
+	}
+	button {
+		font-family: sans-serif;
+		font-size: 20px;
+		font-weight: bold;
+		padding: 10px 20px;
+		/*-moz-border-radius: 6px;
+		-webkit-border-radius: 6px;*/
+		border-radius: 6px;
+		border: 1px solid #00000;
+	}
+	</style>
+
+	<script>
+	// If running this file from Evothings Workbench redirect console.log
+	// to the Workbench Tools window.
+	if (window.hyper && window.hyper.log) { console.log = hyper.log }
+	</script>
+
+	<script src="cordova.js"></script>
+	<script src="libs/evothings/evothings.js"></script>
+	<script src="libs/evothings/easyble/easyble.js"></script>
+</head>
+
+<body>
+	<h1>EasyBLE Demo</h1>
+
+	<button onclick="startScan()">Start Scan</button>
+
+	<button onclick="stopScan()">Stop Scan</button>
+
+	<!-- This is for reloading when the app is loaded from a
+		web server and not from Evothings Workbench. -->
+	<button onclick="window.location.reload(true)">Reload</button>
+
+	<p>This example app displays services and characteristics of a
+	BLE device.</p>
+
+	<p>Output from this app is displayed in the Evothings Workbench
+	Tools window. Please open this window before starting to scan.</p>
+
+	<p>Kindly note that you need to put the name of the BLE device
+	you wish to scan for to in the variable 'myDeviceName' in the
+	code in file index.html.</p>
+
+	<script>
+	// App now uses a button instead of scanning automatically.
+	// Run init function when the mobile device is ready
+	// and alls scripts are loaded.
+	//document.addEventListener(
+	//	'deviceready',
+	//	function() { evothings.scriptsLoaded(startScan) },
+	//	false)
+
+	// The closest device found.
+	var deviceWithStrongestRSSI = null
+
+	function startScan()
+	{
+		console.log('Scanning for devices...')
+
+		// Reset found device variable.
+		deviceWithStrongestRSSI = null
+
+		// Specify that devices are reported repeatedly so that
+		// we get the most recent RSSI reading for each device.
+		evothings.easyble.reportDeviceOnce(false)
+
+		// Start scanning.
+		evothings.easyble.startScan(deviceDetected, scanError)
+
+		// Connect to the closest device after this timeout.
+		setTimeout(connectToFoundDevice, 3000)
+	}
+
+	function stopScan()
+	{
+		console.log('Stop scanning')
+
+		evothings.easyble.stopScan()
+	}
+
+	function deviceDetected(device)
+	{
+		console.log('Device found: ' + device.name + ' rssi: ' + device.rssi)
+
+		// THIS IS WHERE YOU SPECIFY THE NAME OF THE
+		// BLE DEVICE TO CONNECT TO.
+		var myDeviceName = 'PUT NAME OF BLE DEVICE HERE'
+
+		// Check that advertised name matches the devices we are looking for.
+		if (device.name == myDeviceName)
+		{
+			if (!deviceWithStrongestRSSI)
+			{
+				// First found device.
+				deviceWithStrongestRSSI = device
+			}
+			else
+			{
+				// Update if next found device has stronger RSSI.
+				if (device.rssi > deviceWithStrongestRSSI.rssi)
+				{
+					deviceWithStrongestRSSI = device
+				}
+			}
+		}
+	}
+
+	function connectToFoundDevice()
+	{
+		if (!deviceWithStrongestRSSI)
+		{
+			console.log('No device found')
+			return
+		}
+
+		stopScan()
+
+		console.log('Connecting...')
+
+		deviceWithStrongestRSSI.connect(deviceConnected, connectError)
+	}
+
+	function deviceConnected(device)
+	{
+		console.log('Connected to device: ' + device.name)
+		console.log('Reading services... (this may take some time)')
+		device.readServices(
+			null, // null means "read all services".
+			doneReadingServices,
+			readServicesError)
+	}
+
+	function scanError(errorCode)
+	{
+		console.log('Scan failed:  + errorCode')
+	}
+
+	function connectError(errorCode)
+	{
+		console.log('Connect failed:  + errorCode')
+	}
+
+	function readServicesError(errorCode)
+	{
+		console.log('Read services failed:  + errorCode')
+	}
+
+	// Function that gets called when reading device.readServices()
+	// has successfully completed.
+	function doneReadingServices(device)
+	{
+		// Print to Tools window in Evothings Workbench.
+		logAllServices(device)
+
+		// Done disconnecting from device.
+		console.log('Done disconnecting from device')
+
+		// Disconnect from device.
+		device.close()
+	}
+
+	function logAllServices(device)
+	{
+		// Here we simply print found services, characteristics,
+		// and descriptors to the debug console in Evothings Workbench.
+
+		// Notice that the fields prefixed with "__" are arrays that
+		// contain services, characteristics and notifications found
+		// in the call to device.readServices().
+
+		// Print all services.
+		for (var serviceUUID in device.__services)
+		{
+			var service = device.__services[serviceUUID]
+			console.log('  service: ' + service.uuid)
+
+			// Print all characteristics for service.
+			for (var characteristicUUID in service.__characteristics)
+			{
+				var characteristic = service.__characteristics[characteristicUUID]
+				console.log('    characteristic: ' + characteristic.uuid)
+
+				// Print all descriptors for characteristic.
+				for (var descriptorUUID in characteristic.__descriptors)
+				{
+					var descriptor = characteristic.__descriptors[descriptorUUID]
+					console.log('      descriptor: ' + descriptor.uuid)
+				}
+			}
+		}
+	}
+	</script>
+</body>
+
+</html>
