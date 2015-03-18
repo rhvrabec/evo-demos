@@ -7,8 +7,8 @@
     <author email="mikael@evothings.com" href="http://evothings.com">
         Mikael Kindborg
     </author>
-    <xcontent src="index.html" />
-    <content src="http://192.168.43.131:4042" />
+    <content src="index.html" />
+    <xcontent src="http://192.168.43.131:4042" />
     <access origin="*" />
     <preference name="DisallowOverscroll" value="true" />
 </widget>
