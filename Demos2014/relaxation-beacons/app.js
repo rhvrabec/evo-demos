@@ -42,7 +42,8 @@ app.initialize = function()
 // the iBeacon API is now available.
 app.onDeviceReady = function()
 {
-	// Specify a shortcut for the location manager holding the iBeacon functions.
+	// Specify a shortcut for the location manager that
+	// has the iBeacon functions.
 	window.locationManager = cordova.plugins.locationManager
 
 	// Start tracking beacons!
@@ -54,26 +55,25 @@ app.startScanForBeacons = function()
 	//console.log('startScanForBeacons')
 
 	// The delegate object contains iBeacon callback functions.
-	var delegate = locationManager.delegate.implement(
+	var delegate = new cordova.plugins.locationManager.Delegate()
+
+	delegate.didDetermineStateForRegion = function(pluginResult)
 	{
-		didDetermineStateForRegion: function(pluginResult)
-		{
-			//console.log('didDetermineStateForRegion: ' + JSON.stringify(pluginResult))
-		},
+		//console.log('didDetermineStateForRegion: ' + JSON.stringify(pluginResult))
+	}
 
-		didStartMonitoringForRegion: function(pluginResult)
-		{
-			//console.log('didStartMonitoringForRegion:' + JSON.stringify(pluginResult))
-		},
+	delegate.didStartMonitoringForRegion = function(pluginResult)
+	{
+		//console.log('didStartMonitoringForRegion:' + JSON.stringify(pluginResult))
+	}
 
-		didRangeBeaconsInRegion: function(pluginResult)
-		{
-			//console.log('didRangeBeaconsInRegion: ' + JSON.stringify(pluginResult))
-			app.didRangeBeaconsInRegion(pluginResult)
-		}
-	})
+	delegate.didRangeBeaconsInRegion = function(pluginResult)
+	{
+		//console.log('didRangeBeaconsInRegion: ' + JSON.stringify(pluginResult))
+		app.didRangeBeaconsInRegion(pluginResult)
+	}
 
-	// Set the delegare object to use.
+	// Set the delegate object to use.
 	locationManager.setDelegate(delegate)
 
 	// Start monitoring and ranging our beacons.
@@ -99,7 +99,8 @@ app.startScanForBeacons = function()
 // Display pages depending of which beacon is close.
 app.didRangeBeaconsInRegion = function(pluginResult)
 {
-console.log('numbeacons in region: ' + pluginResult.beacons.length)
+	//console.log('numbeacons in region: ' + pluginResult.beacons.length)
+
 	// There must be a beacon within range.
 	if (0 == pluginResult.beacons.length)
 	{
@@ -113,7 +114,7 @@ console.log('numbeacons in region: ' + pluginResult.beacons.length)
 	// The region identifier is the page id.
 	var pageId = pluginResult.region.identifier
 
-	console.log('ranged beacon: ' + pageId + ' ' + beacon.proximity)
+	//console.log('ranged beacon: ' + pageId + ' ' + beacon.proximity)
 
 	// If the beacon is close and represents a new page, then show the page.
 	if ((beacon.proximity == 'ProximityImmediate')

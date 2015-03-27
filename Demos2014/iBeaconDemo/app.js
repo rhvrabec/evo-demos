@@ -42,7 +42,8 @@ app.initialize = function()
 // the iBeacon API is now available.
 app.onDeviceReady = function()
 {
-	// Specify a shortcut for the location manager holding the iBeacon functions.
+	// Specify a shortcut for the location manager that
+	// has the iBeacon functions.
 	window.locationManager = cordova.plugins.locationManager
 
 	// Start tracking beacons!
@@ -54,26 +55,26 @@ app.startScanForBeacons = function()
 	//console.log('startScanForBeacons')
 
 	// The delegate object contains iBeacon callback functions.
-	var delegate = locationManager.delegate.implement(
+	// The delegate object contains iBeacon callback functions.
+	var delegate = new cordova.plugins.locationManager.Delegate()
+
+	delegate.didDetermineStateForRegion = function(pluginResult)
 	{
-		didDetermineStateForRegion: function(pluginResult)
-		{
-			//console.log('didDetermineStateForRegion: ' + JSON.stringify(pluginResult))
-		},
+		//console.log('didDetermineStateForRegion: ' + JSON.stringify(pluginResult))
+	}
 
-		didStartMonitoringForRegion: function(pluginResult)
-		{
-			//console.log('didStartMonitoringForRegion:' + JSON.stringify(pluginResult))
-		},
+	delegate.didStartMonitoringForRegion = function(pluginResult)
+	{
+		//console.log('didStartMonitoringForRegion:' + JSON.stringify(pluginResult))
+	}
 
-		didRangeBeaconsInRegion: function(pluginResult)
-		{
-			//console.log('didRangeBeaconsInRegion: ' + JSON.stringify(pluginResult))
-			app.didRangeBeaconsInRegion(pluginResult)
-		}
-	})
+	delegate.didRangeBeaconsInRegion = function(pluginResult)
+	{
+		//console.log('didRangeBeaconsInRegion: ' + JSON.stringify(pluginResult))
+		app.didRangeBeaconsInRegion(pluginResult)
+	}
 
-	// Set the delegare object to use.
+	// Set the delegate object to use.
 	locationManager.setDelegate(delegate)
 
 	// Start monitoring and ranging our beacons.
