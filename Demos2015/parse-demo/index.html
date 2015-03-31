@@ -64,7 +64,7 @@ Demonstration of an IoT app using the Parse API.
 	var temperatureTimer = null
 
 	// Variable that holds last known temperature reading.
-	var lastTemperatureReading = 0.0
+	var lastTemperatureReading = '0.0'
 
 	function initialise()
 	{
@@ -135,7 +135,7 @@ Demonstration of an IoT app using the Parse API.
 	{
 		// Save the temperature value to the Parse data cloud.
 		saveSensorReading(
-			'IRTemperature',
+			'Temperature',
 			lastTemperatureReading,
 			onSaveTemperatureSuccess(lastTemperatureReading),
 			onSaveTemperatureError)

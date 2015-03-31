@@ -109,7 +109,7 @@ Next add a timer that writes simulated "temperature" values:
     {
     	// Timer that updates temperature values.
         setInterval(function() {
-            lastTemperatureReading = (Math.random() * 5) + 20
+            lastTemperatureReading = ((Math.random() * 5) + 20).toFixed(2)
         	},
         	5000)
 
