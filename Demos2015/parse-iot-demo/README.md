@@ -33,7 +33,7 @@ The <a href="http://evothings.com/evothings-studio-starter-kit/">Evothings Studi
 
 ## Download the example app code
 
-The <a href="https://github.com/divineprog/evo-demos/tree/master/Demos2015/parse-demo">example code for this tutorial</a> is available on GitHub. The app is called "Parse IoT Demo" and contains the code needed to run the app using Evothings Client and Evothings Workbench.
+The <a href="https://github.com/divineprog/evo-demos/tree/master/Demos2015/parse-iot-demo">example code for this tutorial</a> is available on GitHub. The app is called "Parse IoT Demo" and contains the code needed to run the app using Evothings Client and Evothings Workbench.
 
 ## Set up your Parse account
 
