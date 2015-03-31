@@ -53,9 +53,17 @@ Demonstration of an IoT app using the Parse API.
 	<script src="//www.parsecdn.com/js/parse-1.4.0.min.js"></script>
 
 	<script>
-	// Globals.
+	// SensorTag object.
 	var sensortag = evothings.tisensortag.createInstance()
+
+	// Update interval is once each minute. You can make
+	// this value smaller to get more frequent updates.
+	var temperatureInterval = 60000 // Change to 5000 for 5 second intervals.
+
+	// Timer for temperature upload.
 	var temperatureTimer = null
+
+	// Variable that holds last known temperature reading.
 	var lastTemperatureReading = 0.0
 
 	function initialise()
@@ -81,7 +89,7 @@ Demonstration of an IoT app using the Parse API.
 		sensortag
 			.statusCallback(statusHandler)
 			.errorCallback(errorHandler)
-			.irTemperatureCallback(irTemperatureHandler, 60000)
+			.irTemperatureCallback(irTemperatureHandler, temperatureInterval)
 	}
 
 	function connectToSensorTag()
@@ -94,10 +102,7 @@ Demonstration of an IoT app using the Parse API.
 
 		// Start the interval timer for uploading data. This is a
 		// workaround for the SensorTag interval setting.
-		// Update interval is once each minute. You can make
-		// this value smaller to get more frequent updates,
-		// for example 5000 for every 5 seconds.
-		temperatureTimer = setInterval(onTemperatureTimer, 60000)
+		temperatureTimer = setInterval(onTemperatureTimer, temperatureInterval)
 	}
 
 	function disconnectFromSensorTag()
