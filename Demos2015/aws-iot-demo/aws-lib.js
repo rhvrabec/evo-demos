@@ -7,8 +7,7 @@ evothings.aws = evothings.aws || {}
  */
 evothings.aws.initialize = function(config)
 {
-	AWS.config.update(config)
-	evothings.aws.lambda = new AWS.Lambda()
+	evothings.aws.lambda = new AWS.Lambda(config)
 }
 
 /**
@@ -21,7 +20,6 @@ evothings.aws.initialize = function(config)
 evothings.aws.update = function(sensorid, value, success, error)
 {
 	var params = {
-      	FunctionName: 'LambdaTest',
       	Payload: JSON.stringify({
       		operation: 'update',
       		sensorid: sensorid,
@@ -50,7 +48,6 @@ evothings.aws.update = function(sensorid, value, success, error)
 evothings.aws.query = function(sensorid, success, error)
 {
 	var params = {
-      	FunctionName: 'LambdaTest',
       	Payload: JSON.stringify({
       		operation: 'query',
       		sensorid: sensorid })
