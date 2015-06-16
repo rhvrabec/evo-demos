@@ -28,16 +28,19 @@ The <a href="https://github.com/divineprog/evo-demos/tree/master/Demos2015/aws-i
 
 Please follow the <a href="http://docs.aws.amazon.com/lambda/latest/dg/setting-up.html"> instructions at the AWS website</a> to get up and running with AWS Lambda.
 
+The files in folder <code>aws-resources</code> contains templates you can use to set up the AWS Lambda service.
+
 ## Enter your access keys
 
 Open file <code>aws-config.js</code> and enter your keys and access code, and region id.
 
-Here is an example:
+Here is an example (NOTE: These are NOT real working values!):
 
     evothings.aws.config = {
         accessKeyId: 'BKIAJJLEW6SOEIQMFAZQ',
         secretAccessKey: 'FkmcCfctEFwayUYIpYoxeMv+tbgG2E8zbzvW8BQl',
         region: 'eu-west-1'
+        params: { FunctionName: 'KOE2015-IoTAPI-SGXAVI8Z1PHK' }
     }
 
 ## Overview of the example apps
