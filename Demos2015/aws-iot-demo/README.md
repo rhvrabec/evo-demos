@@ -39,7 +39,7 @@ Here is an example (NOTE: These are NOT real working values!):
     evothings.aws.config = {
         accessKeyId: 'BKIAJJLEW6SOEIQMFAZQ',
         secretAccessKey: 'FkmcCfctEFwayUYIpYoxeMv+tbgG2E8zbzvW8BQl',
-        region: 'eu-west-1'
+        region: 'eu-west-1',
         params: { FunctionName: 'KOE2015-IoTAPI-SGXAVI8Z1PHK' }
     }
 
