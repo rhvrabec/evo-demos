@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, user-scalable=no
+		initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+
+	<title>FullStack Demo</title>
+
+	<style>
+		@import 'viewer/ui/css/evothings-app.css';
+	</style>
+
+	<script>
+	// Redirect console.log to Evothings Workbench.
+	if (window.hyper && window.hyper.log) { console.log = hyper.log }
+	</script>
+
+</head>
+
+<body>
+
+	<header>
+		<button class="back" onclick="history.back()">
+			<img src="viewer/ui/images/arrow-left.svg" />
+		</button>
+
+		<img class="logotype" src="viewer/ui/images/logo.svg" alt="Evothings" />
+
+		<!--
+		<button id="menu-button" tabindex="0" onclick="this.focus()">
+			<img src="viewer/ui/images/menu.svg" />
+		</button>
+
+		<menu>
+			<menuitem>
+				<a href="#">Home</a>
+			</menuitem>
+
+			<menuitem>
+				<a href="#troubleshooting">Troubleshooting</a>
+			</menuitem>
+		</menu>
+		-->
+	</header>
+
+	<h1>FullStack Demo</h1>
+
+	<div>
+		<style>button { font-size:65%; width:100%; }</style>
+		<button id="button-accelerometer" class="green">Accelerometer</button>
+		<button id="button-ble-scan" class="blue">BLE Scan</button>
+		<button id="button-eddystone-scan" class="indigo">Eddystone Scan</button>
+		<button id="button-viewer" class="red">Viewer</button>
+	</div>
+
+	<script src="cordova.js"></script>
+	<script src="viewer/libs/jquery/jquery.js"></script>
+	<script src="viewer/libs/evothings/evothings.js"></script>
+	<script src="viewer/libs/evothings/ui/ui.js"></script>
+
+	<script>
+	$('#button-accelerometer').on('click', function() {
+		loadApp('cordova-accelerometer') } )
+	$('#button-ble-scan').on('click', function() {
+		loadApp('ble-scan') } )
+	$('#button-eddystone-scan').on('click', function() {
+		loadApp('eddystone-scan') } )
+	$('#button-viewer').on('click', function() {
+		loadApp('viewer') } )
+
+	function loadApp(app)
+	{
+		window.location.assign(app + '/index.html')
+	}
+	</script>
+
+</body>
+
+</html>
