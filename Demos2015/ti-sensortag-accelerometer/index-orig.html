@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<!--
+	BLE application that demonstrates how to read the accelerometer
+	on the TI SensorTag.
+-->
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>MagicStone</title>
+	<link rel="stylesheet" href="common.css" />
+	<style>
+	body {
+		background: rgb(255,255,255);
+	}
+	#stone {
+		position: absolute;
+		width: 200px;
+		height: auto;
+		top: 0px;
+		left: 0px;
+		display: none;
+	}
+	</style>
+	<script>
+	// Redirect console.log to Evothings Workbench.
+	if (window.hyper) { console.log = hyper.log; }
+	</script>
+	<script src="cordova.js"></script>
+	<script src="easy-ble.js"></script>
+	<script src="sensortag.js"></script>
+	<script src="sprite.js"></script>
+</head>
+<body>
+	<!-- <h1>MagicStone</h1> -->
+
+	<!-- <button onclick="summonStone()">Summon Stone</button> -->
+
+	<img id="stone" src="MagicStone.png"/>
+
+	<script>
+	var stone = spritemaker()
+	stone.setDOMElement(document.getElementById('stone'))
+
+	function summonStone()
+	{
+		// Connect to the SensorTag.
+		sensortag.connect(
+			[sensortag.ACCELEROMETER_UUID],
+			function()
+			{
+				// Display stone.
+				stone.setCenterX(stone.getPlayfieldWidth() / 2)
+				stone.setCenterY(stone.getPlayfieldHeight() / 2)
+				stone.show()
+
+				// Start accelerometer.
+				sensortag.acceleromenterOn(
+					100, // millisecond rate
+					moveStone, // action function
+					function(error)
+					{
+						console.log('Accelerometer error: ' + error)
+					})
+			},
+			function(error)
+			{
+				console.log('Connect error: ' + error)
+				if (error == 'disconnected')
+				{
+					stone.hide()
+					setTimeout(summonStone, 1000)
+				}
+			})
+	}
+
+	function moveStone(data)
+	{
+		var dataArray = new Int8Array(data)
+		//console.log('byteLength: ' + data.byteLength)
+		//console.log('length: ' + dataArray.length)
+		//console.log('data: ' + dataArray[0] + ' ' + dataArray[1] + ' ' + dataArray[2])
+
+		var dx = dataArray[0] * 2
+		var dy = dataArray[1] * 2
+
+		var x = stone.getCenterX() + dx
+		var y = stone.getCenterY() - dy
+
+		x = Math.min(x, stone.getPlayfieldWidth())
+		x = Math.max(x, 0)
+
+		y = Math.min(y, stone.getPlayfieldHeight())
+		y = Math.max(y, 0)
+
+		stone.setCenterX(x)
+		stone.setCenterY(y)
+	}
+
+	document.addEventListener('deviceready', summonStone, false)
+	</script>
+</body>
+</html>
