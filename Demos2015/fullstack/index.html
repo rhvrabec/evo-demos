@@ -13,6 +13,19 @@
 		@import 'viewer/ui/css/evothings-app.css';
 	</style>
 
+	<style>
+	input
+	{
+		border: 1px solid #aaaaaa !important;
+		width: 100% !important;
+	}
+	button
+	{
+		font-size:65%;
+		width:100%;
+	}
+	</style>
+
 	<script>
 	// Redirect console.log to Evothings Workbench.
 	if (window.hyper && window.hyper.log) { console.log = hyper.log }
@@ -49,17 +62,38 @@
 	<h1>FullStack Demo</h1>
 
 	<div>
-		<style>button { font-size:65%; width:100%; }</style>
 		<button id="button-accelerometer" class="green">Accelerometer</button>
 		<button id="button-ble-scan" class="blue">BLE Scan</button>
 		<button id="button-eddystone-scan" class="indigo">Eddystone Scan</button>
-		<button id="button-viewer" class="red">Viewer</button>
+		<p><b>Connect to Alex:</b></p>
+		<div id="connect-ui">
+			<input id="input-connect-key" type="url" placeholder="Enter connect key" />
+			<br/>
+			<button id="button-connect" class="small charcoal">Connect</button>
+		</div>
+
+		<div id="message-ui">
+			<p id="message"></p>
+			<img id="spinner" src="viewer/ui/images/loader.gif"/>
+		</div>
 	</div>
+
+	<br />
+	<br />
+	<br />
+	<br />
+	<br />
+	<br />
+	<br />
+	<br />
+	<br />
+	<br />
 
 	<script src="cordova.js"></script>
 	<script src="viewer/libs/jquery/jquery.js"></script>
 	<script src="viewer/libs/evothings/evothings.js"></script>
 	<script src="viewer/libs/evothings/ui/ui.js"></script>
+	<script src="viewer/js/app.js"></script>
 
 	<script>
 	$('#button-accelerometer').on('click', function() {
@@ -68,8 +102,6 @@
 		loadApp('ble-scan') } )
 	$('#button-eddystone-scan').on('click', function() {
 		loadApp('eddystone-scan') } )
-	$('#button-viewer').on('click', function() {
-		loadApp('viewer') } )
 
 	function loadApp(app)
 	{
