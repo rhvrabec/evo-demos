@@ -10,7 +10,7 @@
 	<title>FullStack Demo</title>
 
 	<style>
-		@import 'viewer/ui/css/evothings-app.css';
+		@import 'lib/ui/css/evothings-app.css';
 	</style>
 
 	<style>
@@ -37,14 +37,14 @@
 
 	<header>
 		<button class="back" onclick="history.back()">
-			<img src="viewer/ui/images/arrow-left.svg" />
+			<img src="lib/ui/images/arrow-left.svg" />
 		</button>
 
-		<img class="logotype" src="viewer/ui/images/logo.svg" alt="Evothings" />
+		<img class="logotype" src="lib/ui/images/logo.svg" alt="Evothings" />
 
 		<!--
 		<button id="menu-button" tabindex="0" onclick="this.focus()">
-			<img src="viewer/ui/images/menu.svg" />
+			<img src="lib/ui/images/menu.svg" />
 		</button>
 
 		<menu>
@@ -74,7 +74,7 @@
 
 		<div id="message-ui">
 			<p id="message"></p>
-			<img id="spinner" src="viewer/ui/images/loader.gif"/>
+			<img id="spinner" src="lib/ui/images/loader.gif"/>
 		</div>
 	</div>
 
@@ -90,10 +90,10 @@
 	<br />
 
 	<script src="cordova.js"></script>
-	<script src="viewer/libs/jquery/jquery.js"></script>
-	<script src="viewer/libs/evothings/evothings.js"></script>
-	<script src="viewer/libs/evothings/ui/ui.js"></script>
-	<script src="viewer/js/app.js"></script>
+	<script src="lib/libs/jquery/jquery.js"></script>
+	<script src="lib/libs/evothings/evothings.js"></script>
+	<script src="lib/libs/evothings/ui/ui.js"></script>
+	<script src="lib/js/app.js"></script>
 
 	<script>
 	$('#button-accelerometer').on('click', function() {

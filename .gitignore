@@ -33,3 +33,6 @@ node_modules
 # Cordova projects
 platforms
 plugins
+
+# Evothings project files
+evothings.json
