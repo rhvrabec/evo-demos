@@ -13,7 +13,7 @@ if (window.hyper && window.hyper.log)
 var app = {}
 
 // Production server address.
-app.defaultServerAddress = 'https://deploy.evothings.com'
+app.defaultServerAddress = 'http://staging.evothings.com:8081'
 
 app.initialize = function()
 {
@@ -58,13 +58,16 @@ app.onConnectButton = function()
 	{
 		// Not a URL, assuming a connect code.
 		// Check if the code exists and connect to the server if ok.
-		app.getServerForConnectKey(keyOrURL)
+		//app.getServerForConnectKey(keyOrURL)
+		var url = app.defaultServerAddress + '/connect/' + keyOrURL
+		window.location.assign(url)
 	}
 }
 
 /**
  * Ask server set in app for which server to use to connect, based on the connect key.
  */
+/* Not used.
 app.getServerForConnectKey = function(key)
 {
 	// Ask the default server for which server to use with this key.
@@ -99,7 +102,9 @@ app.getServerForConnectKey = function(key)
 		app.hideSpinner()
 	})
 }
+*/
 
+/* Not used.
 app.validateConnectKeyAndConnect = function(key, serverAddress)
 {
 	// Check that key exists.
@@ -137,6 +142,7 @@ app.validateConnectKeyAndConnect = function(key, serverAddress)
 		app.hideSpinner()
 	})
 }
+*/
 
 app.getServerAddress = function()
 {
