@@ -1,0 +1,126 @@
+
+html, body
+{
+	margin: 0px;
+	padding: 0px;
+	width: 100%;
+	-webkit-text-size-adjust: 100%;
+}
+
+html
+{
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+*, *:before, *:after
+{
+	-webkit-box-sizing: inherit;
+	-moz-box-sizing: inherit;
+	box-sizing: inherit;
+}
+
+*
+{
+	-webkit-tap-highlight-color: rgba(0,0,0,0);
+}
+
+body
+{
+	font-family: Helvetica, sans-serif;
+}
+
+.style-header
+{
+	position: fixed;
+	left: 0px;
+	top: 0px;
+	right: 0px;
+	height: 130px;
+	z-index: 1000;
+	background: green;
+	background-image: url("images/vegetables.jpg");
+	background-size: cover;
+}
+
+.style-header h1
+{
+	position: absolute;
+	left: 10px;
+	bottom: -29px;
+	color: white;
+	font-size: 48px;
+	font-weight: bold;
+}
+
+.style-header .icon-back
+{
+	position: absolute;
+	left: 0px;
+	top: 5px;
+	width: 50px;
+	height: 50px;
+}
+
+.style-header .icon-back img
+{
+	width: 100%;
+	height: auto;
+}
+
+.style-header .style-evothings-logo
+{
+	position: absolute;
+	right: 10px;
+	top: 10px;
+	width: 120px;
+	height: auto;
+}
+
+.style-items
+{
+	position: relative;
+	margin-top: 130px;
+}
+
+.style-item
+{
+	position: absolute;
+	width: 100%;
+	padding: 10px;
+	background: white;
+	border-bottom: 1px solid #000000;
+	-webkit-transition: all 0.7s ease-out;
+    -moz-transition: all 0.7s ease-out;
+	-ms-transition: all 0.7s ease-out;
+    transition: all 0.7s ease-out;
+}
+
+.style-item h2
+{
+	color: black;
+	font-size: 24px;
+	font-weight: bold;
+	margin-top: 0px;
+}
+
+.style-item img
+{
+	position: absolute;
+	right: 10px;
+	top: 10px;
+	width: auto;
+	height: 140px;;
+}
+
+.style-item table
+{
+	font-size: 20px;
+}
+
+#id-item-prototype
+{
+	display: none;
+}
+
