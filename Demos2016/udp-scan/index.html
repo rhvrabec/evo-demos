@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, user-scalable=no,
+		shrink-to-fit=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+
+	<title>UDP Scan</title>
+
+	<style>
+		@import 'ui/css/evothings-app.css';
+	</style>
+
+	<script>
+	// Redirect console.log to Evothings Workbench.
+	if (window.hyper && window.hyper.log) { console.log = hyper.log }
+	</script>
+
+</head>
+
+<body ontouchstart=""><!-- ontouchstart="" enables low-delay CSS transitions. -->
+
+	<header>
+		<button class="back" onclick="history.back()">
+			<img src="ui/images/arrow-left.svg" />
+		</button>
+
+		<img class="logotype" src="ui/images/logo.svg" alt="Evothings" />
+
+		<!--<button class="menu" onclick=""><img src="ui/images/menu.svg" /></button>-->
+	</header>
+
+	<h1>UDP Scan</h1>
+
+	<p>This app scans for servers using UDP.</p>
+
+	<p>Start the server in file upd-server.js, or use your own udp-server. Further instructions are available in upd-server.js.</p>
+
+	<p>Then tap SCAN.</p>
+
+	<button class="yellow wide" onclick="app.scan()">SCAN</button>
+
+	<p id="info"></p>
+
+	<script src="cordova.js"></script>
+	<script src="libs/evothings/evothings.js"></script>
+	<script src="libs/evothings/ui/ui.js"></script>
+	<script src="libs/evothings/sockets/udp/udp.js"></script>
+
+	<script>
+	// Application object
+	var app = {}
+
+	app.socketId = null
+
+	// Create UPD socket when Cordova is loaded.
+	document.addEventListener(
+		'deviceready',
+		function() { evothings.scriptsLoaded(app.createUDPSocket) },
+		false)
+
+	app.scan = function()
+	{
+		// Might have to do this repeatedly until a response is received
+		// since packets may be lost.
+		app.broadcast(app.socketId)
+	}
+
+	app.createUDPSocket = function()
+	{
+		evothings.sockets.udp.create(
+			app.onSocketCreated,
+			app.onDataReceived,
+			app.onError)
+	}
+
+	app.onSocketCreated = function(socketId)
+	{
+		// Save reference to socket ID.
+		app.socketId = socketId
+
+		app.showInfo('UDP socket created: ' + socketId)
+	}
+
+	app.broadcast = function(socketId)
+	{
+		app.showInfo('Broadcasting packet')
+
+		// Modify what you send depending on how the server is set up.
+		var dataBuffer = evothings.sockets.stringToBuffer('WhoIsThere')
+
+		evothings.sockets.udp.broadcast(
+			socketId,
+			4088, //port
+			dataBuffer,
+			app.onBroadcastSuccess,
+			app.onError)
+	}
+
+	app.onBroadcastSuccess = function(resultCode)
+	{
+		app.showInfo('UDP broadcast success: ' + resultCode)
+	}
+
+	app.onDataReceived = function(info)
+	{
+		var ip = info.remoteAddress
+		var data = evothings.sockets.bufferToString(info.data)
+		//var dataObject = JSON.parse(data)
+
+		app.showInfo('UDP data received: ' + ip + ' ' + data)
+	}
+
+	app.onError = function(errorCode, errorString)
+	{
+		app.showInfo('UDP error ' + errorCode + ': ' + errorString)
+	}
+
+	app.showInfo = function(info)
+	{
+		document.getElementById('info').innerHTML = info
+		console.log(info)
+	}
+	</script>
+
+</body>
+
+</html>
