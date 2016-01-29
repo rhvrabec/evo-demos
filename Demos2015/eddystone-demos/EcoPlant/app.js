@@ -123,7 +123,7 @@
 		mItems.push({
 			element: element,
 			hasBeacon: false,
-			distance:  5000 * Math.random(),
+			distance:  2000 * Math.random(),
 			temperature: 0,
 			humidity: 0,
 			uvlight: 0
@@ -184,12 +184,12 @@
 
 	function setItemTemperature(item, value)
 	{
-		setItemSensorValue(item, '.style-temperature', value.toFixed(2), '&deg;')
+		setItemSensorValue(item, '.style-temperature', value.toFixed(2), ' C')
 	}
 
 	function setItemHumidity(item, value)
 	{
-		setItemSensorValue(item, '.style-humidity', value.toFixed(2), '&#37;')
+		setItemSensorValue(item, '.style-humidity', value.toFixed(2), ' &#37;')
 	}
 
 	function setItemUVLight(item, value)
@@ -201,11 +201,11 @@
 	{
 		if (value >= 100)
 		{
-			setItemSensorValue(item, '.style-distance', Math.round(value / 100), 'm')
+			setItemSensorValue(item, '.style-distance', Math.round(value / 100), ' m')
 		}
 		else
 		{
-			setItemSensorValue(item, '.style-distance', value, 'cm')
+			setItemSensorValue(item, '.style-distance', value, ' cm')
 		}
 	}
 
