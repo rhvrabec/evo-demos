@@ -1,7 +1,7 @@
 /*
-Library that performs UDP broadcast/scanning.
-For documentation of chrome.sockets.udp see this page:
-https://developer.chrome.com/apps/sockets_udp
+Library that abstracts Chrome TCP sockets.
+For documentation of chrome.sockets.tcp see this page:
+https://developer.chrome.com/apps/sockets_tcp
 
 Author: Mikael Kindborg
 */
@@ -10,12 +10,12 @@ Author: Mikael Kindborg
 {
 
 evothings.sockets = evothings.sockets || {}
-evothings.sockets.udp = {}
+evothings.sockets.tcp = {}
 
-evothings.sockets.udp.ERROR_UDP_SOCKET_CREATE = 1
-evothings.sockets.udp.ERROR_UDP_SOCKET_BIND = 2
-evothings.sockets.udp.ERROR_UDP_SOCKET_RECEIVE = 3
-evothings.sockets.udp.ERROR_UDP_SOCKET_SEND = 4
+evothings.sockets.tcp.ERROR_TCP_SOCKET_CREATE = 1
+evothings.sockets.tcp.ERROR_TCP_SOCKET_CONNECT = 2
+evothings.sockets.tcp.ERROR_TCP_SOCKET_RECEIVE = 3
+evothings.sockets.tcp.ERROR_TCP_SOCKET_SEND = 4
 
 // Helper function.
 evothings.sockets.stringToBuffer = function(string)
@@ -32,7 +32,7 @@ evothings.sockets.stringToBuffer = function(string)
 // Helper function.
 evothings.sockets.bufferToString = function(buffer)
 {
-	return String.fromCharCode.apply(null, new Uint8Array(buf));
+	return String.fromCharCode.apply(null, new Uint8Array(buffer));
 
 	/*
 	// Alternative implementation.
@@ -46,8 +46,10 @@ evothings.sockets.bufferToString = function(buffer)
 	*/
 }
 
-evothings.sockets.udp.create = function(
-	createdCallback,
+evothings.sockets.tcp.connect = function(
+	address,
+	port,
+	connectedCallback,
 	receivedCallback,
 	errorCallback)
 {
@@ -55,62 +57,73 @@ evothings.sockets.udp.create = function(
 	var mSocket = {}
 
 	// Instance methods.
-	mSocket.broadcast = broadcastImpl
-	mSocket.send = sendImpl
-	mSocket.close = closeImpl
+	mSocket.send = function(
+		dataBuffer,
+		successCallback,
+		errorCallback)
+	{
+		sendImpl(
+			mSocket,
+			dataBuffer,
+			successCallback,
+			errorCallback)
+	}
 
-	// Create UDP socket.
+	mSocket.close = function(callback)
+	{
+		closeImpl(mSocket, callback)
+	}
+
+	// Create TCP socket.
 	function create()
 	{
 		try
 		{
-			chrome.sockets.udp.create(
+			chrome.sockets.tcp.create(
 				{},
 				function(createInfo)
 				{
 					mSocket.socketId = createInfo.socketId
-					bind(mSocket.socketId)
+					connect(mSocket.socketId)
 				})
 		}
 		catch (error)
 		{
 			errorCallback(
 				mSocket,
-				evothings.sockets.udp.ERROR_UDP_SOCKET_CREATE,
-				'Failed to create UDP socket: ' + error)
+				evothings.sockets.tcp.ERROR_TCP_SOCKET_CREATE,
+				'Failed to create TCP socket: ' + error)
 		}
 	}
 
-	// Bind UDP socket.
-	function bind(socketId)
+	function connect(socketId)
 	{
-		chrome.sockets.udp.bind(
+		chrome.sockets.tcp.connect(
 			socketId,
-			null,
-			0,
+			address,
+			port,
 			function(result)
 			{
 				// Result 0 means success, negative is error.
 				if (result < 0)
 				{
-					// Socket create error.
 					errorCallback(
 						mSocket,
-						evothings.sockets.udp.ERROR_UDP_SOCKET_CREATE,
-						'Failed to bind UDP socket: ' + result)
+						evothings.sockets.tcp.ERROR_TCP_SOCKET_CREATE,
+						'Failed to connect TCP socket: ' + result)
 				}
 				else
 				{
 					// Set receive listener.
-					chrome.sockets.udp.onReceive.addListener(receive)
-
-					// Socket create success.
-					createdCallback(mSocket)
+					chrome.sockets.tcp.onReceive.addListener(receive)
+console.log('CONNECTED: ' + mSocket.socketId)
+					// Socket connect success.
+					connectedCallback(mSocket)
 				}
 			})
 	}
 
-	// Handle incoming UPD packet.
+	// Handle incoming data.
 	function receive(receiveInfo)
 	{
 		if (receiveInfo.socketId !== mSocket.socketId)
@@ -121,13 +134,14 @@ evothings.sockets.udp.create = function(
 
 		try
 		{
+			// Data is in receiveInfo.data
 			receivedCallback(mSocket, receiveInfo)
 		}
 		catch (error)
 		{
 			errorCallback(
 				mSocket,
-				evothings.sockets.udp.ERROR_UDP_SOCKET_RECEIVE,
+				evothings.sockets.tcp.ERROR_TCP_SOCKET_RECEIVE,
 				'Receive error: ' + error)
 		}
 	}
@@ -136,65 +150,45 @@ evothings.sockets.udp.create = function(
 	create()
 }
 
-// Broadcast packet.
-function broadcastImpl(
-	socket,
-	port,
-	dataBuffer,
-	successCallback,
-	errorCallback)
-{
-	evothings.sockets.udp.send(
-		socket,
-		'255.255.255.255',
-		port,
-		dataBuffer,
-		successCallback,
-		errorCallback)
-}
-
 // Send packet.
 function sendImpl(
 	socket,
-	address,
-	port,
 	dataBuffer,
 	successCallback,
 	errorCallback)
 {
-	chrome.sockets.udp.send(
+	chrome.sockets.tcp.send(
 		socket.socketId,
 		dataBuffer,
-		address,
-		port,
 		function(sendInfo)
 		{
 			if (sendInfo.resultCode < 0)
 			{
 				errorCallback(
 					socket,
-					evothings.sockets.udp.ERROR_UDP_SOCKET_SEND,
+					evothings.sockets.tcp.ERROR_TCP_SOCKET_SEND,
 					'Send error: ' + sendInfo.resultCode)
 			}
 			else
 			{
-				successCallback(
-					socket,
-					sendInfo)
+				successCallback(socket, sendInfo)
 			}
 		})
 }
 
-// Close UDP socket.
-function closeImpl(
-	socket,
-	callback)
+// Close socket.
+function closeImpl(socket, callback)
 {
-	chrome.sockets.udp.close(
+	chrome.sockets.tcp.disconnect(
 		socket.socketId,
 		function()
 		{
-			callback && callback(socket)
+			chrome.sockets.tcp.close(
+				socket.socketId,
+				function()
+				{
+					callback && callback(socket)
+				})
 		})
 }
 

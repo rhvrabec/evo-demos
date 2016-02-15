@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, user-scalable=no,
+		shrink-to-fit=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+
+	<title>TCP Connect</title>
+
+	<style>
+		@import 'ui/css/evothings-app.css';
+	</style>
+
+	<script>
+	// Redirect console.log to Evothings Workbench.
+	if (window.hyper && window.hyper.log) { console.log = hyper.log }
+	</script>
+
+</head>
+
+<body ontouchstart=""><!-- ontouchstart="" enables low-delay CSS transitions. -->
+
+	<header>
+		<button class="back" onclick="history.back()">
+			<img src="ui/images/arrow-left.svg" />
+		</button>
+
+		<img class="logotype" src="ui/images/logo.svg" alt="Evothings" />
+
+		<!--<button class="menu" onclick=""><img src="ui/images/menu.svg" /></button>-->
+	</header>
+
+	<h1>TCP Connect</h1>
+
+	<p>This app connects to a server using TCP.</p>
+
+	<button class="yellow wide" onclick="app.getData()">Get Data</button>
+
+	<p id="info"></p>
+
+	<script src="cordova.js"></script>
+	<script src="libs/evothings/evothings.js"></script>
+	<script src="libs/evothings/ui/ui.js"></script>
+	<script src="libs/evothings/sockets/tcp/tcp.js"></script>
+
+	<script>
+	// Application object
+	var app = {}
+
+	app.tcpSocket = null
+
+	// Create UPD socket when Cordova is loaded.
+	document.addEventListener(
+		'deviceready',
+		function() {
+			//evothings.scriptsLoaded(foo)
+			},
+		false)
+
+	app.getData = function()
+	{
+		evothings.sockets.tcp.connect(
+			'evothings.com',
+			80,
+			app.onSocketCreated,
+			app.onDataReceived,
+			app.onError)
+	}
+
+	app.onSocketCreated = function(socket)
+	{
+		// Save reference to socket.
+		app.tcpSocket = socket
+
+		app.showInfo('Sending data')
+
+		var data = evothings.sockets.stringToBuffer('GET / HTTP/1.0\n\n')
+
+		app.send(socket, data)
+	}
+
+	app.send = function(socket, data)
+	{
+		socket.send(
+			data,
+			app.onSendSuccess,
+			app.onError)
+	}
+
+	app.onSendSuccess = function(socket, resultCode)
+	{
+		app.showInfo('Data sent: ' + resultCode)
+	}
+
+	app.onDataReceived = function(socket, info)
+	{
+		var data = evothings.sockets.bufferToString(info.data)
+		//var dataObject = JSON.parse(data)
+
+		app.showInfo('Data received: ' + data)
+	}
+
+	app.onError = function(socket, errorCode, errorString)
+	{
+		app.showInfo('Error ' + errorCode + ': ' + errorString)
+	}
+
+	app.showInfo = function(info)
+	{
+		document.getElementById('info').innerHTML = info
+		console.log(info)
+	}
+	</script>
+
+</body>
+
+</html>

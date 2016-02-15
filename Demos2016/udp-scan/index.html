@@ -53,7 +53,8 @@
 	// Application object
 	var app = {}
 
-	app.socketId = null
+	// UDP socket object.
+	app.udpSocket = null
 
 	// Create UPD socket when Cordova is loaded.
 	document.addEventListener(
@@ -65,7 +66,7 @@
 	{
 		// Might have to do this repeatedly until a response is received
 		// since packets may be lost.
-		app.broadcast(app.socketId)
+		app.broadcast(app.udpSocket)
 	}
 
 	app.createUDPSocket = function()
@@ -76,44 +77,43 @@
 			app.onError)
 	}
 
-	app.onSocketCreated = function(socketId)
-	{
-		// Save reference to socket ID.
-		app.socketId = socketId
-
-		app.showInfo('UDP socket created: ' + socketId)
-	}
-
-	app.broadcast = function(socketId)
+	app.broadcast = function(udpSocket)
 	{
 		app.showInfo('Broadcasting packet')
 
 		// Modify what you send depending on how the server is set up.
 		var dataBuffer = evothings.sockets.stringToBuffer('WhoIsThere')
 
-		evothings.sockets.udp.broadcast(
-			socketId,
+		udpSocket.broadcast(
 			4088, //port
 			dataBuffer,
 			app.onBroadcastSuccess,
 			app.onError)
 	}
 
-	app.onBroadcastSuccess = function(resultCode)
+	app.onSocketCreated = function(socket)
+	{
+		// Save reference to socket.
+		app.udpSocket = socket
+
+		app.showInfo('UDP socket created: ' + socket.socketId)
+	}
+
+	app.onBroadcastSuccess = function(udpSocket, resultCode)
 	{
 		app.showInfo('UDP broadcast success: ' + resultCode)
 	}
 
-	app.onDataReceived = function(info)
+	app.onDataReceived = function(updSocket, receiveInfo)
 	{
-		var ip = info.remoteAddress
-		var data = evothings.sockets.bufferToString(info.data)
+		var ip = receiveInfo.remoteAddress
+		var data = evothings.sockets.bufferToString(receiveInfo.data)
 		//var dataObject = JSON.parse(data)
 
 		app.showInfo('UDP data received: ' + ip + ' ' + data)
 	}
 
-	app.onError = function(errorCode, errorString)
+	app.onError = function(updSocket, errorCode, errorString)
 	{
 		app.showInfo('UDP error ' + errorCode + ': ' + errorString)
 	}
