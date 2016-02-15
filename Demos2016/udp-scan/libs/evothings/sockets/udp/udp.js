@@ -164,4 +164,18 @@ evothings.sockets.udp.send = function(
 		})
 }
 
+// Close UDP socket.
+evothings.sockets.udp.close = function(
+	socketId,
+	successCallback,
+	errorCallback)
+{
+	chrome.sockets.udp.close(
+		socketId,
+		function()
+		{
+			successCallback()
+		})
+}
+
 })(window.evothings || {})
