@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, user-scalable=no,
+		shrink-to-fit=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+
+	<title>Bleat Example</title>
+
+	<script>
+	// Redirect console.log to Evothings Workbench.
+	if (window.hyper && window.hyper.log) { console.log = hyper.log }
+	</script>
+</head>
+
+<body>
+	<h1>Bleat Example</h1>
+
+	<p>Bleat example app.</p>
+
+	<button class="yellow wide" onclick="app.getData()">Scan</button>
+
+	<p id="info"></p>
+
+	<script src="cordova.js"></script>
+	<script src="bleat.core.js"></script>
+    <script src="bleat.evothings.js"></script>
+    <script src="tisensortag.js"></script>
+</body>
+
+</html>
