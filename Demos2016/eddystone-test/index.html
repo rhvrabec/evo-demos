@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, user-scalable=no,
+		shrink-to-fit=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+
+	<title>Eddystone Scan Test</title>
+
+	<style>
+	/* Make text bigger. */
+	body {
+	    font-size: 175%;
+	    }
+
+	/* Make buttons bigger. */
+	button {
+	    font-size: 100%;
+	    padding: 10%;
+	    }
+	</style>
+
+	<script>
+	// Redirect console.log to Evothings Workbench.
+	if (window.hyper && window.hyper.log) { console.log = hyper.log }
+	</script>
+
+</head>
+
+<body>
+
+	<h1>Eddystone Scan Test</h1>
+
+	<button onclick="app.startScan()">Start scan</button>
+	<button onclick="app.stopScan()">Stop scan</button>
+
+	<p id="info"></p>
+
+	<script src="cordova.js"></script>
+	<script src="libs/evothings/evothings.js"></script>
+	<script src="libs/evothings/eddystone/eddystone.js"></script>
+	<script src="libs/jquery/jquery.js"></script>
+
+	<script>
+	// Application object
+	var app = {}
+
+	// Create UPD socket when Cordova is loaded.
+	document.addEventListener(
+		'deviceready',
+		function() { evothings.scriptsLoaded(app.init) },
+		false)
+
+	app.init = function()
+	{
+	}
+
+	app.startScan = function()
+	{
+	    app.showInfo('Scanning...')
+
+	    // Start scan.
+	    evothings.eddystone.startScan(
+            function(beacon)
+            {
+                app.showInfo('Beacon found: ' + beacon.url)
+            },
+            app.onError)
+	}
+
+	app.stopScan = function()
+	{
+	    app.showInfo('Stopped scanning')
+
+	    // Start scan.
+	    evothings.eddystone.stopScan()
+	}
+
+	app.onError = function(error)
+	{
+		app.showInfo('BLE error ' + error)
+	}
+
+	app.showInfo = function(info)
+	{
+		document.getElementById('info').innerHTML = info
+		console.log(info)
+	}
+	</script>
+
+</body>
+
+</html>
