@@ -225,7 +225,10 @@
 			return null
 		}
 
-		var ratio = rssi * 1.0 / txPower
+		// The beacon distance formula uses txPower at 1 meters, but the Eddystone
+		// protocol reports the value at 0 meters. 41dBm is the signal loss that
+		// occurs over 1 meter, so we subtract that from the reported txPower.
+		var ratio = rssi * 1.0 / (txPower - 41)
 		if (ratio < 1.0)
 		{
 			return Math.pow(ratio, 10)
