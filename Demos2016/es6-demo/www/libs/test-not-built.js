@@ -5,7 +5,7 @@
 function foo()
 {
     var text = $('#hello').text()
-    $('#hello').text(text + ' FOOB')
+    $('#hello').text(text + ' FOOBAR')
 }
 
 foo()
