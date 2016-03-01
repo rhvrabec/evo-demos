@@ -62,7 +62,9 @@
 	    app.showInfo('Scanning...')
 
         // Set services you wish to scan for.
-	    evothings.easyble.filterDevicesByService(['0000feaa-0000-1000-8000-00805f9b34fb'])
+        // Change this value to match the service(s) you want.
+	    evothings.easyble.filterDevicesByService(
+	    	['0000feaa-0000-1000-8000-00805f9b34fb'])
 
 	    // Start scan.
 	    evothings.easyble.startScan(
@@ -76,10 +78,10 @@
 
 	app.stopScan = function()
 	{
-	    app.showInfo('Stopped scanning')
-
-	    // Start scan.
+	    // Stop scan.
 	    evothings.easyble.stopScan()
+
+	    app.showInfo('Stopped scanning')
 	}
 
 	app.onError = function(error)
