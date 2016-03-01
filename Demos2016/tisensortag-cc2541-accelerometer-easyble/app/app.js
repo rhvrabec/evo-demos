@@ -40,11 +40,19 @@ app.stop = () =>
 {
 	evothings.easyble.stopScan()
 
-	app.accelerometerTimer && clearInterval(app.accelerometerTimer)
+	if (app.accelerometerTimer)
+	{
+		clearInterval(app.accelerometerTimer)
+		app.accelerometerTimer = null
+	}
 
-	app.device && app.device.close()
+	if (app.device)
+	{
+		app.device.close()
+		app.device = null
+	}
 
-	app.showInfo('Disconneted')
+	app.showInfo('Disconnected')
 }
 
 app.connectToDevice = (device) =>
