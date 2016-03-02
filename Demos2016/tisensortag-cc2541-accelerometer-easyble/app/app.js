@@ -82,7 +82,7 @@ instance.ACCELEROMETER = {
 
 app.enableAccelerometer = (device) =>
 {
-	console.log(JSON.stringify(device, null, 2))
+	//console.log(JSON.stringify(device, null, 2))
 
 	// Turn on accelerometer.
 	device.writeServiceCharacteristic(
@@ -91,7 +91,7 @@ app.enableAccelerometer = (device) =>
 		new Uint8Array([1]),
 		() => {},
 		app.onError)
-/*
+
 	// Set update interval.
 	var milliseconds = 100
 	device.writeServiceCharacteristic(
@@ -100,7 +100,7 @@ app.enableAccelerometer = (device) =>
 		new Uint8Array([milliseconds / 10]),
 		() => {},
 		app.onError)
-
+/*
 	// Set notification to ON.
 	device.writeServiceDescriptor(
 		'f000aa10-0451-4000-b000-000000000000',
@@ -109,15 +109,15 @@ app.enableAccelerometer = (device) =>
 		new Uint8Array([1,0]),
 		() => {},
 		app.onError)
-
+*/
 	// Start sensor notification.
 	device.enableServiceNotification(
 		'f000aa10-0451-4000-b000-000000000000',
 		'f000aa11-0451-4000-b000-000000000000',
 		app.onAccelerometerData,
 		app.onError)
-*/
 
+/* Reading.
 	app.accelerometerTimer = setInterval(
 		() => {
 			device.readServiceCharacteristic(
@@ -127,7 +127,7 @@ app.enableAccelerometer = (device) =>
 				app.onError)
 		},
 		1000)
-
+*/
 }
 
 app.onAccelerometerData = (data) =>

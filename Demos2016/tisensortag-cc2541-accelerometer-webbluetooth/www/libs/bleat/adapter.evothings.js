@@ -49,12 +49,14 @@
 	// Object that holds Bleat adapter functions.
 	var adapter = {};
 
-	var mDeviceHandles = {};
-
-	var mServiceDevices = {};
+	var mDeviceIdToDeviceHandle = {};
+	var mServiceHandleToDeviceHandle = {};
+	var mCharacteristicHandleToDeviceHandle = {};
+	var mDescriptorHandleToDeviceHandle = {};
+	var mCharacteristicHandleToCCCDHandle = {};
 
 	// Add adapter object to Bleat. Adapter functions are defined below.
-	bleat._addAdapter("evothings", adapter);
+	bleat._addAdapter('evothings', adapter);
 
 	// Begin scanning for devices
 	adapter.startScan = function(
@@ -90,21 +92,17 @@
 		errorFn			// Function(String errorMsg)	function called if error occurs
 		)
 	{
-		console.log('@@ adapter.connect handle: ' + handle)
 		evothings.ble.connect(
 			handle,
 			function(connectInfo) {
 				// Connected.
-				if (2 == connectInfo.state && connectFn) {
-					mDeviceHandles[handle] = connectInfo.deviceHandle;
+				if (2 === connectInfo.state && connectFn) {
+					mDeviceIdToDeviceHandle[handle] = connectInfo.deviceHandle;
 					connectFn();
 				}
 				// Disconnected.
-				else if (0 == connectInfo.state && connectFn) {
-					if (mDeviceHandles[handle]) {
-						 evothings.ble.close(mDeviceHandles[handle]);
-						 delete mDeviceHandles[handle];
-					}
+				else if (0 === connectInfo.state && connectFn) {
+					disconnectDevice(handle);
 					disconnectFn();
 				}
 			},
@@ -119,11 +117,7 @@
 		errorFn			// Function(String errorMsg)	function called if error occurs
 		)
 	{
-		console.log('@@ adapter.disconnect handle: ' + handle)
-		if (mDeviceHandles[handle]) {
-			evothings.ble.close(mDeviceHandles[handle]);
-			delete mDeviceHandles[handle];
-		}
+		disconnectDevice(handle);
 	};
 
 	// Discover services on a device
@@ -134,26 +128,32 @@
 		errorFn			// Function(String errorMsg)		function called if error occurs
 		)
 	{
-		console.log('@@ adapter.discoverServices ' + handle + ' : ' + serviceUUIDs + 'foo')
-
-		if (!mDeviceHandles[handle]) {
-			if (errorFn) { errorFn('Device does not exist'); }
+		var deviceHandle = getDeviceHandleFromDeviceId(handle, errorFn);
+		if (!deviceHandle) {
 			return;
 		}
 
 		evothings.ble.services(
-			mDeviceHandles[handle],
+			deviceHandle,
 			function(services) {
+
+				// Collect found services.
 				var discoveredServices = [];
+
 				services.forEach(function(serviceInfo) {
 					var serviceUUID = helpers.getCanonicalUUID(serviceInfo.uuid);
+
+					// Filter services.
 					var includeService =
 						!serviceUUIDs ||
-						0 == serviceUUIDs.length ||
+						0 === serviceUUIDs.length ||
 						serviceUUIDs.indexOf(serviceUUID) >= 0;
+
 					if (includeService) {
-						mServiceDevices[serviceInfo.handle] = handle;
-						console.log('@@ adapter.discoverServices mServiceDevices ' + JSON.stringify(mServiceDevices))
+						// Set device for service.
+						mServiceHandleToDeviceHandle[serviceInfo.handle] = deviceHandle;
+
+						// Add the service.
 						discoveredServices.push(
 							{
 								_handle: serviceInfo.handle,
@@ -162,12 +162,13 @@
 							});
 					}
 				});
+
+				// Return result.
 				if (completeFn) {
 					completeFn(discoveredServices);
 				}
 			},
 			function(error) {
-				console.log('@@ adapter.discoverServices error ' + error)
 				if (errorFn) { errorFn(error); }
 			});
 	};
@@ -180,8 +181,6 @@
 		errorFn			// Function(String errorMsg)		function called if error occurs
 		)
 	{
-		console.log('@@ adapter.discoverIncludedServices handle: ' + handle)
-
 		// Not implemented in the BLE plugin.
         completeFn([]);
 	};
@@ -194,34 +193,77 @@
 		errorFn					// Function(String errorMsg)				function called if error occurs
 		)
 	{
-		console.log('@@ adapter.discoverCharacteristics handle: ' + handle)
-
-		var deviceHandle = mDeviceHandles[mServiceDevices[handle]];
-
-		console.log('@@ adapter.discoverCharacteristics deviceHandle: ' + deviceHandle)
+		var deviceHandle = getDeviceHandleFromServiceHandle(handle, errorFn);
+		if (!deviceHandle) {
+			return;
+		}
 
         evothings.ble.characteristics(
         	deviceHandle,
         	handle,
         	function(characteristics) {
-        		console.log('adapter.discoverCharacteristics characteristics: ' + JSON.stringify(characteristics))
+
+				// Collect found characteristics.
+				var discoveredCharacteristics = [];
+
+				characteristics.forEach(function(characteristicInfo) {
+					var characteristicUUID =
+						helpers.getCanonicalUUID(characteristicInfo.uuid);
+
+					// Filter characteristics.
+					var includeCharacteristic =
+						!characteristicUUIDs ||
+						0 === characteristicUUIDs.length ||
+						characteristicUUIDs.indexOf(characteristicUUID) >= 0;
+
+					if (includeCharacteristic) {
+						// Set device for characteristic.
+						mCharacteristicHandleToDeviceHandle[
+							characteristicInfo.handle] = deviceHandle;
+
+						// Add the characteristic.
+						// For the characteristic property constants, see:
+						//   https://github.com/evothings/cordova-ble/blob/master/ble.js#L256
+						// Goes without saying they should have symbolic names!!
+						// Created issue: https://github.com/evothings/cordova-ble/issues/90
+						discoveredCharacteristics.push(
+							{
+								_handle: characteristicInfo.handle,
+								uuid: characteristicUUID,
+								properties: {
+                                    broadcast:
+                                    	characteristicInfo.property & 1,
+                                    read:
+                                    	characteristicInfo.property & 2,
+                                    writeWithoutResponse:
+                                    	(characteristicInfo.property & 4) && // AND or OR?
+                                    	(characteristicInfo.writeType & 1),
+                                    write:
+                                    	characteristicInfo.property & 8,
+                                    notify:
+                                    	characteristicInfo.property & 16,
+                                    indicate:
+                                    	characteristicInfo.property & 32,
+                                    authenticatedSignedWrites:
+                                    	(characteristicInfo.property & 64) && // AND or OR?
+                                    	(characteristicInfo.writeType & 4),
+                                    reliableWrite:
+                                    	false,
+                                    writableAuxiliaries:
+                                    	false
+                                }
+							});
+					}
+				});
+
+				// Return result.
+				if (completeFn) {
+					completeFn(discoveredCharacteristics);
+				}
         	},
 			function(error) {
-				console.log('@@ adapter.discoverCharacteristics error ' + error)
 				if (errorFn) { errorFn(error); }
 			});
-
-        	/*
-                characteristics.forEach(function(characteristicInfo) {
-
-                        if (characteristicUUIDs.length === 0 || characteristicUUIDs.indexOf(characteristicInfo.uuid) >= 0) {
-                            this.characteristicHandles[characteristicInfo.handle] = deviceHandle;
-                            var properties = [];// [characteristicInfo.permission + characteristicInfo.property + characteristicInfo.writeType]
-                            var characteristic = new bleat._Characteristic(characteristicInfo.handle, characteristicInfo.uuid, properties);
-                            service.characteristics[characteristic.uuid] = characteristic;
-                        }
-            */
-
 	};
 
 	// Discover descriptors on a characteristic
@@ -232,7 +274,54 @@
 		errorFn				// Function(String errorMsg)			function called if error occurs
 		)
 	{
-		console.log('@@ adapter.discoverDescriptors ' + descriptorUUIDs)
+		var deviceHandle = getDeviceHandleFromCharacteristicHandle(handle, errorFn);
+		if (!deviceHandle) {
+			return;
+		}
+
+        evothings.ble.descriptors(
+        	deviceHandle,
+        	handle,
+        	function(descriptors) {
+
+				// Collect found descriptors.
+				var discoveredDescriptors = [];
+
+				descriptors.forEach(function(descriptorInfo) {
+					var descriptorUUID = helpers.getCanonicalUUID(descriptorInfo.uuid);
+
+					// If this is the CCCD we save it for use in enableNotify.
+					if (descriptorUUID === '00002902-0000-1000-8000-00805f9b34fb') {
+						mCharacteristicHandleToCCCDHandle[handle] = descriptorInfo.handle;
+					}
+
+					// Filter descriptors.
+					var includeDescriptor =
+						!descriptorUUIDs ||
+						0 === descriptorUUIDs.length ||
+						descriptorUUIDs.indexOf(descriptorUUID) >= 0;
+
+					if (includeDescriptor) {
+						// Set device for descriptor.
+						mDescriptorHandleToDeviceHandle[descriptorInfo.handle] = deviceHandle;
+
+						// Add the descriptor.
+						discoveredDescriptors.push(
+							{
+								_handle: descriptorInfo.handle,
+								uuid: descriptorUUID
+							});
+					}
+				});
+
+				// Return result.
+				if (completeFn) {
+					completeFn(discoveredDescriptors);
+				}
+        	},
+			function(error) {
+				if (errorFn) { errorFn(error); }
+			});
 	};
 
 	// Read a characteristic value
@@ -242,16 +331,53 @@
 		errorFn			// Function(String errorMsg)	function called if error occurs
 		)
 	{
+		var deviceHandle = getDeviceHandleFromCharacteristicHandle(handle, errorFn);
+		if (!deviceHandle) {
+			return;
+		}
+
+		// TODO: Re-enable notification on iOS if there was one, see issue:
+		// https://github.com/evothings/cordova-ble/issues/61
+		// Currently we do not work around this limitation.
+
+        evothings.ble.readCharacteristic(
+        	deviceHandle,
+        	handle,
+        	function(data) {
+				if (completeFn) {
+					completeFn(bufferToDataView(data));
+				}
+        	},
+			function(error) {
+				if (errorFn) { errorFn(error); }
+			});
 	};
 
 	// Write a characteristic value
 	adapter.writeCharacteristic = function(
 		handle,			// String handle				characteristic handle
 		value,			// DataView value				value to write
-		completeFn,		// Function(DataView value)		function called when write completes
+		completeFn,		// Function()					function called when write completes
 		errorFn			// Function(String errorMsg)	function called if error occurs
 		)
 	{
+		var deviceHandle = getDeviceHandleFromCharacteristicHandle(handle, errorFn);
+		if (!deviceHandle) {
+			return;
+		}
+
+        evothings.ble.writeCharacteristic(
+        	deviceHandle,
+        	handle,
+        	value,
+        	function() {
+				if (completeFn) {
+					completeFn();
+				}
+        	},
+			function(error) {
+				if (errorFn) { errorFn(error); }
+			});
 	};
 
 	// Enable value change notifications on a characteristic
@@ -262,6 +388,43 @@
 		errorFn			// Function(String errorMsg)	function called if error occurs
 		)
 	{
+		var deviceHandle = getDeviceHandleFromCharacteristicHandle(handle, errorFn);
+		if (!deviceHandle) {
+			return;
+		}
+
+		// TODO: Android needs the CCCD written to for notifications
+        // Should be encapsulated in native android layer, see issue:
+        // https://github.com/evothings/cordova-ble/issues/30
+
+        // Write the CCCD regardless of platform, makes no harm on iOS.
+        writeCCCD(
+        	deviceHandle,
+        	handle,
+			enableNotification,
+			function(error) {
+				if (errorFn) { errorFn(error); }
+			});
+
+		function enableNotification()
+		{
+			evothings.ble.enableNotification(
+				deviceHandle,
+				handle,
+				function(data) {
+					if (notifyFn) {
+						notifyFn(bufferToDataView(data));
+					}
+				},
+				function(error) {
+					if (errorFn) { errorFn(error); }
+				});
+
+			// Notifications "should have" been enabled.
+			if (completeFn) {
+				completeFn();
+			}
+		}
 	};
 
 	// Disable value change notifications on a characteristic
@@ -271,6 +434,29 @@
 		errorFn			// Function(String errorMsg)	function called if error occurs
 		)
 	{
+		var deviceHandle = getDeviceHandleFromCharacteristicHandle(handle, errorFn);
+		if (!deviceHandle) {
+			return;
+		}
+
+        evothings.ble.disableNotification(
+        	deviceHandle,
+        	handle,
+        	function() {
+				if (completeFn) {
+					completeFn();
+				}
+        	},
+			function(error) {
+				if (errorFn) { errorFn(error); }
+			});
+
+		// TODO: iOS doesn't call back after disable, see issue:
+		// https://github.com/evothings/cordova-ble/issues/65
+		// Hack to compensate.
+		if (platformIsIOS()) {
+			setTimeout(completeFn, 0); // Timeout perhaps not needed.
+		}
 	};
 
 	// Read a descriptor value
@@ -280,6 +466,22 @@
 		errorFn			// Function(String errorMsg)	function called if error occurs
 		)
 	{
+		var deviceHandle = getDeviceHandleFromDescriptorHandle(handle, errorFn);
+		if (!deviceHandle) {
+			return;
+		}
+
+        evothings.ble.readDescriptor(
+        	deviceHandle,
+        	handle,
+        	function(data) {
+				if (completeFn) {
+					completeFn(bufferToDataView(data));
+				}
+        	},
+			function(error) {
+				if (errorFn) { errorFn(error); }
+			});
 	};
 
 	// Write a descriptor value
@@ -290,7 +492,131 @@
 		errorFn			// Function(String errorMsg)	function called if error occurs
 		)
 	{
+		var deviceHandle = getDeviceHandleFromDescriptorHandle(handle, errorFn);
+		if (!deviceHandle) {
+			return;
+		}
+
+        evothings.ble.writeDescriptor(
+        	deviceHandle,
+        	handle,
+        	value,
+        	function() {
+				if (completeFn) {
+					completeFn();
+				}
+        	},
+			function(error) {
+				if (errorFn) { errorFn(error); }
+			});
 	};
+
+	function disconnectDevice(handle)
+	{
+		var deviceHandle = mDeviceIdToDeviceHandle[handle];
+		if (deviceHandle) {
+			// Disconnect the device.
+			evothings.ble.close(deviceHandle);
+			// Delete device handle mapping.
+			delete mDeviceIdToDeviceHandle[handle];
+			// Delete related mappings for service handles etc.
+			deleteDeviceHandleMappings(deviceHandle, mServiceHandleToDeviceHandle);
+			deleteDeviceHandleMappings(deviceHandle, mCharacteristicHandleToDeviceHandle, true);
+			deleteDeviceHandleMappings(deviceHandle, mDescriptorHandleToDeviceHandle);
+		}
+	}
+
+	function deleteDeviceHandleMappings(deviceHandle, map, isCharateristicsMap)
+	{
+		for (var key in map) {
+			if (deviceHandle === map[key]) {
+
+				// Delete the mapping.
+				delete map[key];
+
+				// If mapping for this key exists (yes it is a hack to do this here).
+				if (isCharateristicsMap && mCharacteristicHandleToCCCDHandle[key]) {
+					delete mCharacteristicHandleToCCCDHandle[key];
+				}
+			}
+		}
+	}
+
+	function getDeviceHandleFromDeviceId(handle, errorFn)
+	{
+		var deviceHandle = mDeviceIdToDeviceHandle[handle];
+		if (!deviceHandle) {
+			if (errorFn) { errorFn('Device does not exist for device id: ' + handle); }
+			return null;
+		}
+		return deviceHandle;
+	}
+
+	function getDeviceHandleFromServiceHandle(handle, errorFn)
+	{
+		var deviceHandle = mServiceHandleToDeviceHandle[handle];
+		if (!deviceHandle) {
+			if (errorFn) { errorFn('Device does not exist for service handle: ' + handle); }
+			return null;
+		}
+		return deviceHandle;
+	}
+
+	function getDeviceHandleFromCharacteristicHandle(handle, errorFn)
+	{
+		var deviceHandle = mCharacteristicHandleToDeviceHandle[handle];
+		if (!deviceHandle) {
+			if (errorFn) { errorFn('Device does not exist for characteristic handle: ' + handle); }
+			return null;
+		}
+		return deviceHandle;
+	}
+
+	function writeCCCD(deviceHandle, characteristicHandle, successCallback, errorCallback)
+	{
+		// Do we have a saved descriptor handle from descriptor discovery?
+		var cccdHandle = mCharacteristicHandleToCCCDHandle[characteristicHandle];
+		if (cccdHandle) {
+			writeTheCCCD(cccdHandle);
+		}
+		else {
+			discoverTheCCCD();
+		}
+
+		function writeTheCCCD(cccdHandle)
+		{
+			evothings.ble.writeDescriptor(
+				deviceHandle,
+				cccdHandle,
+				new Uint8Array([1,0]),
+				function() {
+					successCallback();
+				},
+				function(error) {
+					errorCallback(error);
+				});
+		}
+
+		function discoverTheCCCD()
+		{
+			adapter.discoverDescriptors(
+				characteristicHandle,
+				'00002902-0000-1000-8000-00805f9b34fb',	// CCCD UUID
+				function(descriptors) {
+					var cccdHandle = mCharacteristicHandleToCCCDHandle[characteristicHandle];
+					if (cccdHandle) {
+						writeTheCCCD(cccdHandle);
+					}
+					else {
+						errorCallback('Could not find CCCD for characteristic: ' + characteristicHandle);
+					}
+				},
+				function(error) {
+					errorCallback(error);
+					return;
+				});
+		}
+	}
 
 	/**
 	 * Create a Bleat deviceInfo object based on the device info from the BLE plugin.
@@ -399,17 +725,17 @@
 			var i;
 
 			// Local Name.
-			if (type == 0x08 || type == 0x09) {
+			if (type === 0x08 || type === 0x09) {
 				// Convert UTF8 encoded buffer and strip null characters from the resulting string.
 				device.name = evothings.ble.fromUtf8(
 					new Uint8Array(byteArray.buffer, pos, length)).replace('\0', '');
 			}
 			// TX Power Level.
-			else if (type == 0x0a) {
+			else if (type === 0x0a) {
 				device.adData.txPower = littleEndianToInt8(byteArray, pos);
 			}
 			// 16-bit Service Class UUID.
-			else if (type == 0x02 || type == 0x03) {
+			else if (type === 0x02 || type === 0x03) {
 				for (i = 0; i < length; i += 2) {
 					device.adData.serviceUUIDs.push(
 						helpers.getCanonicalUUID(
@@ -417,7 +743,7 @@
 				}
 			}
 			// 32-bit Service Class UUID.
-			else if (type == 0x04 || type == 0x05) {
+			else if (type === 0x04 || type === 0x05) {
 				for (i = 0; i < length; i += 4) {
 					device.adData.serviceUUIDs.push(
 						helpers.getCanonicalUUID(
@@ -425,7 +751,7 @@
 				}
 			}
 			// 128-bit Service Class UUID.
-			else if (type == 0x06 || type == 0x07) {
+			else if (type === 0x06 || type === 0x07) {
 				for (i = 0; i < length; i += 16) {
 					device.adData.serviceUUIDs.push(
 						helpers.getCanonicalUUID(arrayToUUID(byteArray, pos + i)));
@@ -436,6 +762,7 @@
 		}
 	}
 /*
+	Not used.
 	function stringToArrayBuffer(string) {
 		var buffer = new ArrayBuffer(string.length);
 		var bufferView = new Uint8Array(buffer);
@@ -451,9 +778,11 @@
 	}
 */
 	// Code from https://github.com/evothings/evothings-libraries/blob/master/libs/evothings/easyble/easyble.js
-	// Should be encapsulated in the native Android implementation (see issue #62)
+	// Should be encapsulated in the native Android implementation, see issue:
+	// https://github.com/evothings/cordova-ble/issues/62
 
-	function b64ToUint6(nChr) {
+	function b64ToUint6(nChr)
+	{
 		return nChr > 64 && nChr < 91 ? nChr - 65
 			: nChr > 96 && nChr < 123 ? nChr - 71
 			: nChr > 47 && nChr < 58 ? nChr + 4
@@ -462,7 +791,8 @@
 			: 0;
 	}
 
-	function base64DecToArr(sBase64, nBlocksSize) {
+	function base64DecToArr(sBase64, nBlocksSize)
+	{
 		var sB64Enc = sBase64.replace(/[^A-Za-z0-9\+\/]/g, "");
 		var nInLen = sB64Enc.length;
 		var nOutLen = nBlocksSize ?
@@ -490,21 +820,25 @@
 	 * @param {number} offset - Start of data.
 	 * @return Converted number.
 	 */
-	function littleEndianToInt8(data, offset) {
+	function littleEndianToInt8(data, offset)
+	{
 		var x = data[offset];
 		if (x & 0x80) x = x - 256;
 		return x;
 	}
 
-	function littleEndianToUint16(data, offset) {
+	function littleEndianToUint16(data, offset)
+	{
 		return (data[offset + 1] << 8) + data[offset];
 	}
 
-	function littleEndianToUint32(data, offset) {
+	function littleEndianToUint32(data, offset)
+	{
 		return (data[offset + 3] << 24) + (data[offset + 2] << 16) + (data[offset + 1] << 8) + data[offset];
 	}
 
-	function arrayToUUID(array, offset) {
+	function arrayToUUID(array, offset)
+	{
 		var uuid = "";
 		for (var i = 0; i < 16; i++) {
 			uuid += ("00" + array[offset + i].toString(16)).slice(-2);
@@ -512,9 +846,39 @@
 		return uuid;
 	}
 
-	function bufferToDataView(buffer) {
+	function bufferToDataView(buffer)
+	{
 		// Buffer to ArrayBuffer
 		var arrayBuffer = new Uint8Array(buffer).buffer;
 		return new DataView(arrayBuffer);
 	}
+
+	/*
+	Not used.
+    function dataViewToBuffer(dataView)
+    {
+        // DataView to TypedArray
+        var typedArray = new Uint8Array(dataView.buffer);
+        return new Buffer(typedArray);
+    }*/
+
+    function getPlatform()
+    {
+		if (window.cordova) {
+			return window.cordova.platformId;
+		}
+		else {
+			return null;
+		}
+    }
+
+    function platformIsIOS()
+    {
+		return 'ios' === getPlatform();
+    }
+
+    function platformIsAndroid()
+    {
+		return 'android' === getPlatform();
+    }
 });

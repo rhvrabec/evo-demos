@@ -132,7 +132,7 @@
     var BluetoothDevice = function(properties) {
         this._handle = null;
 
-        this.id = "unknown"; 
+        this.id = "unknown";
         this.name = null;
         this.adData = {
             appearance: null,
