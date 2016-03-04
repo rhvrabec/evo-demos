@@ -9,3 +9,9 @@ function foo()
 }
 
 foo()
+
+/*
+import * as math from "mylib";
+
+console.log("2π = " + math.sum(math.pi, math.pi));
+*/

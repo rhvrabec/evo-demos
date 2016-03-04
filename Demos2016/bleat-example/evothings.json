@@ -1,0 +1,8 @@
+{
+  "app-icon": "app-icon.png",
+  "use-es6": true,
+  "app-dir": "app",
+  "www-dir": "www",
+  "index-file": "index.html",
+  "app-uuid": "f7863e6e-d35e-4bd0-831b-07031c2f6ba0"
+}
