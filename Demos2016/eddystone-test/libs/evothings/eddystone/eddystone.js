@@ -31,9 +31,9 @@ var isScanning = false;
  * @description Starts scanning for Eddystone devices.
  * <p>Found devices and errors will be reported to the supplied callbacks.</p>
  * <p>Will keep scanning indefinitely until you call stopScan().</p>
- * To conserve energy, call stopScan() as soon as you've found the device
- * you're looking  for.
- * <p>Calling this function while scanning is in progress will fail.</p>
+ * <p>To conserve energy, call stopScan() as soon as you've found the device
+ * you're looking for.</p>
+ * <p>Calling startScan() while scanning is in progress will produce an error.</p>
  *
  * @param {evothings.eddystone.scanCallback} - Success function called
  * when a beacon is found.
@@ -143,6 +143,56 @@ evothings.eddystone.stopScan = function()
 {
 	evothings.easyble.stopScan();
 	isScanning = false;
+}
+
+/**
+ * @description Calculate the accuracy (distance in meters) of the beacon.
+ * <p>The beacon distance calculation uses txPower at 1 meters, but the
+ * Eddystone protocol reports the value at 0 meters. 41dBm is the signal
+ * loss that occurs over 1 meter, this value is subtracted by default
+ * from the reported txPower. You can tune the calculation by adding
+ * or subtracting to param txPower.<p>
+ * <p>Note that the returned distance value is not accurate, and that
+ * it fluctuates over time. Sampling/filtering over time is recommended
+ * to obtain a stable value.<p>
+ * @public
+ * @param txPower The txPower of the beacon.
+ * @param rssi The RSSI of the beacon, subtract or add to this value to
+ * tune the dBm strength. 41dBm is subtracted from this value in the
+ * distance algorithm used by calculateAccuracy.
+ * @return Distance in meters, or null if unable to compute distance
+ * (occurs for example when txPower or rssi is undefined).
+ * @example
+ *   // Note that beacon.txPower and beacon.rssi many be undefined,
+ *   // in which case calculateAccuracy returns null. This happens
+ *   // before txPower and rssi have been reported by the beacon.
+ *   var distance = evothings.eddystone.calculateAccuracy(
+ *       beacon.txPower, beacon.rssi);
+ */
+evothings.eddystone.calculateAccuracy = function(txPower, rssi)
+{
+	if (!rssi || rssi >= 0 || !txPower)
+	{
+		return null
+	}
+
+	// Algorithm
+	// http://developer.radiusnetworks.com/2014/12/04/fundamentals-of-beacon-ranging.html
+	// http://stackoverflow.com/questions/21338031/radius-networks-ibeacon-ranging-fluctuation
+
+	// The beacon distance formula uses txPower at 1 meters, but the Eddystone
+	// protocol reports the value at 0 meters. 41dBm is the signal loss that
+	// occurs over 1 meter, so we subtract that from the reported txPower.
+	var ratio = rssi * 1.0 / (txPower - 41)
+	if (ratio < 1.0)
+	{
+		return Math.pow(ratio, 10)
+	}
+	else
+	{
+		var accuracy = (0.89976) * Math.pow(ratio, 7.7095) + 0.111
+		return accuracy
+	}
 }
 
 // Return true on frame type recognition, false otherwise.

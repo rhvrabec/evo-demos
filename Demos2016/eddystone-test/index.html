@@ -77,7 +77,7 @@
 
 	app.onBeaconFound = function(beacon)
 	{
-		var distance = calculateBeaconDistance(beacon) || ''
+		var distance = app.calculateBeaconDistance(beacon) || ''
 		app.showInfo('Beacon found: ' + beacon.url + ' ' + distance)
 	}
 
@@ -92,45 +92,10 @@
 		console.log(info)
 	}
 
-	// http://stackoverflow.com/questions/21338031/radius-networks-ibeacon-ranging-fluctuation
-	// http://developer.radiusnetworks.com/2014/12/04/fundamentals-of-beacon-ranging.html
-	function calculateBeaconDistance(beacon)
+	app.calculateBeaconDistance = function(beacon)
 	{
-		if (('number' == (typeof beacon.txPower)) &&
-			('number' == (typeof beacon.rssi)))
-		{
-			return calculateAccuracy(beacon.txPower, beacon.rssi)
-		}
-		else
-		{
-			return null
-		}
+		return evothings.eddystone.calculateAccuracy(beacon.txPower, beacon.rssi)
 	}
-
-	// http://stackoverflow.com/questions/21338031/radius-networks-ibeacon-ranging-fluctuation
-	// http://developer.radiusnetworks.com/2014/12/04/fundamentals-of-beacon-ranging.html
-	function calculateAccuracy(txPower, rssi)
-	{
-		if (rssi >= 0 || !txPower)
-		{
-			return null
-		}
-
-		// The beacon distance formula uses txPower at 1 meters, but the Eddystone
-		// protocol reports the value at 0 meters. 41dBm is the signal loss that
-		// occurs over 1 meter, so we subtract that from the reported txPower.
-		var ratio = rssi * 1.0 / (txPower - 41)
-		if (ratio < 1.0)
-		{
-			return Math.pow(ratio, 10)
-		}
-		else
-		{
-			var accuracy = (0.89976) * Math.pow(ratio, 7.7095) + 0.111
-			return accuracy
-		}
-	}
-
 	</script>
 
 </body>
