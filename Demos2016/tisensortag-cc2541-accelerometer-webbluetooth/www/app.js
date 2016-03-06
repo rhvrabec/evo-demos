@@ -18,27 +18,26 @@
 	var accelerometerService;
 	var accelerometer;
 
+	function showInfo(info) {
+		document.getElementById('info').innerHTML = info;
+		//console.log(info);
+	}
+
 	function log(message) {
 		console.log(message);
 	}
 
-	document.addEventListener('deviceready', function () {
-		init();
-	}, false);
-
-	function init() {
-		console.log('@@@ app.init');
-	}
-
-	function readAccelerometer(characteristic) {
-		characteristic.readValue().then(function (data) {
-			log('got accel data: ' + data);
-			var accelerometer = getAccelerometerValues(data);
-			log('x: ' + accelerometer.x);
-			log('y: ' + accelerometer.y);
-			log('z: ' + accelerometer.z);
-		});
-	}
+	/* Called from commented out code below.
+ function readAccelerometer(characteristic) {
+ 	characteristic.readValue().then(data => {
+ 		log('got accel data: ' + data)
+ 		var accelerometer = getAccelerometerValues(data);
+ 		log('x: ' + accelerometer.x);
+ 		log('y: ' + accelerometer.y);
+ 		log('z: ' + accelerometer.z);
+ 	})
+ }
+ */
 
 	function getAccelerometerValues(data) {
 		var divisors = { x: 16.0, y: -16.0, z: 16.0 };
@@ -53,15 +52,23 @@
 
 	function onAccelerometerChanged(event) {
 		var characteristic = event.target;
-		console.log(JSON.stringify(getAccelerometerValues(characteristic.value)));
+		var values = getAccelerometerValues(characteristic.value);
+		showInfo('x: ' + values.x + ' y: ' + values.y + ' z: ' + values.z);
 	}
+
+	function init() {
+		console.log('@@@ app.init');
+	}
+
+	document.addEventListener('deviceready', init, false);
 
 	app.start = function () {
 		showInfo('Scanning...');
 
 		bleat.requestDevice({
 			//filters:[{ services:[ '0xf000aa10' ] }]
-			filters: [] // The SensorTag does not advertise services.
+			// The SensorTag does not advertise services so we use the name.
+			filters: [{ name: 'SensorTag' }]
 		}).then(function (device) {
 			log('Found device: ' + device.name);
 			return device.gatt.connect();
@@ -101,12 +108,12 @@
   .then(characteristic => {
   	log('Accelerometer data characteristic: ' + characteristic.uuid);
   	// Read accelerometer every second.
-  	var timer = setInterval(() => { readAccelerometer(characteristic) }, 1000)
+  	var timer = setInterval(() => { readAccelerometer(characteristic) }, 1000);
   	// Keep going for 10 seconds
   	setTimeout(() => {
-  		clearInterval(timer)
-  		gattServer.disconnect()
-  		log('Gatt server connected: ' + gattServer.connected)
+  		clearInterval(timer);
+  		gattServer.disconnect();
+  		log('Gatt server connected: ' + gattServer.connected);
   		},
   		10000)
   })
@@ -123,9 +130,4 @@
 
 		showInfo('Disconnected');
 	};
-
-	function showInfo(info) {
-		document.getElementById('info').innerHTML = info;
-		console.log(info);
-	}
 })();

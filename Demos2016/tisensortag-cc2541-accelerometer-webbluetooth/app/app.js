@@ -1,45 +1,43 @@
 ;(() =>
 {
-'use strict'
+'use strict';
 
 // Application object that exposes global functions.
-window.app = {}
+window.app = {};
 
 // UUIDs
-var accelerometerServiceUUID = 'f000aa10-0451-4000-b000-000000000000'
-var accelerometerDataUUID    = 'f000aa11-0451-4000-b000-000000000000'
-var accelerometerConfigUUID  = 'f000aa12-0451-4000-b000-000000000000'
-var accelerometerPeriodUUID  = 'f000aa13-0451-4000-b000-000000000000'
+var accelerometerServiceUUID = 'f000aa10-0451-4000-b000-000000000000';
+var accelerometerDataUUID    = 'f000aa11-0451-4000-b000-000000000000';
+var accelerometerConfigUUID  = 'f000aa12-0451-4000-b000-000000000000';
+var accelerometerPeriodUUID  = 'f000aa13-0451-4000-b000-000000000000';
 
 // Variables.
-var gattServer
-var accelerometerService
-var accelerometer
+var gattServer;
+var accelerometerService;
+var accelerometer;
+
+function showInfo(info)
+{
+	document.getElementById('info').innerHTML = info;
+	//console.log(info);
+}
 
 function log(message)
 {
-	console.log(message)
+	console.log(message);
 }
 
-document.addEventListener(
-	'deviceready',
-	function() { init() },
-	false)
-
-function init()
-{
-    console.log('@@@ app.init')
-}
-
+/* Called from commented out code below.
 function readAccelerometer(characteristic) {
 	characteristic.readValue().then(data => {
-	log('got accel data: ' + data)
+		log('got accel data: ' + data)
 		var accelerometer = getAccelerometerValues(data);
 		log('x: ' + accelerometer.x);
 		log('y: ' + accelerometer.y);
 		log('z: ' + accelerometer.z);
 	})
 }
+*/
 
 function getAccelerometerValues(data) {
 	var divisors = { x: 16.0, y: -16.0, z: 16.0 };
@@ -54,16 +52,28 @@ function getAccelerometerValues(data) {
 
 function onAccelerometerChanged(event) {
 	var characteristic = event.target;
-	console.log(JSON.stringify(getAccelerometerValues(characteristic.value)));
+	var values = getAccelerometerValues(characteristic.value);
+	showInfo('x: ' + values.x + ' y: '  + values.y + ' z: ' + values.z);
 }
+
+function init()
+{
+    console.log('@@@ app.init');
+}
+
+document.addEventListener(
+	'deviceready',
+	init,
+	false);
 
 app.start = () =>
 {
-	showInfo('Scanning...')
+	showInfo('Scanning...');
 
 	bleat.requestDevice({
 		//filters:[{ services:[ '0xf000aa10' ] }]
-		filters:[] // The SensorTag does not advertise services.
+		// The SensorTag does not advertise services so we use the name.
+		filters:[{ name: 'SensorTag' }]
 	})
 	.then(device => {
 		log('Found device: ' + device.name);
@@ -111,18 +121,18 @@ app.start = () =>
 	.then(characteristic => {
 		log('Accelerometer data characteristic: ' + characteristic.uuid);
 		// Read accelerometer every second.
-		var timer = setInterval(() => { readAccelerometer(characteristic) }, 1000)
+		var timer = setInterval(() => { readAccelerometer(characteristic) }, 1000);
 		// Keep going for 10 seconds
 		setTimeout(() => {
-			clearInterval(timer)
-			gattServer.disconnect()
-			log('Gatt server connected: ' + gattServer.connected)
+			clearInterval(timer);
+			gattServer.disconnect();
+			log('Gatt server connected: ' + gattServer.connected);
 			},
 			10000)
 	})
 	*/
 	.catch(error => {
-		log(error)
+		log(error);
 	});
 }
 
@@ -133,13 +143,7 @@ app.stop = () =>
 		gattServer.disconnect();
 	}
 
-	showInfo('Disconnected')
+	showInfo('Disconnected');
 }
 
-function showInfo(info)
-{
-	document.getElementById('info').innerHTML = info
-	console.log(info)
-}
-
-})()
+})();
