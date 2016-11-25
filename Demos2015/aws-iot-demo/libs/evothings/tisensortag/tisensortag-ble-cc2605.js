@@ -1,22 +1,22 @@
-// Documentation for TI SensorTag CC2541:
+// Documentation for TI SensorTag CC2605:
 // http://processors.wiki.ti.com/index.php/SensorTag_User_Guide
 // http://processors.wiki.ti.com/index.php/File:BLE_SensorTag_GATT_Server.pdf
 
 ;(function()
 {
-	evothings.tisensortag.ble.CC2541 = {}
+	evothings.tisensortag.ble.CC2605 = {}
 
 	/**
 	 * @namespace
-	 * @description Internal implementation of JavaScript library for the TI SensorTag CC2541.
-	 * @alias evothings.tisensortag.ble.CC2541
+	 * @description Internal implementation of JavaScript library for the TI SensorTag CC2605.
+	 * @alias evothings.tisensortag.ble.CC2605
 	 */
 	var sensortag = {}
 
-	evothings.tisensortag.ble.CC2541 = sensortag
+	evothings.tisensortag.ble.CC2605 = sensortag
 
 	/**
-	 * Create a SensorTag CC2541 instance.
+	 * Create a SensorTag CC2605 instance.
 	 * @returns {@link evothings.tisensortag.SensorTagInstance}
 	 * @private
 	 */
@@ -25,7 +25,7 @@
 		/**
 		 * @namespace
 		 * @alias evothings.tisensortag.SensorTagInstanceBLE_CC2541
-		 * @description SensorTag CC2541 instance object.
+		 * @description SensorTag CC2605 instance object.
 		 * @public
 		 */
 		var instance = anInstance
@@ -38,11 +38,11 @@
 		 * @instance
 		 * @public
 		 */
-		instance.deviceModel = 'CC2541'
+		instance.deviceModel = 'CC2605'
 
 		/**
-		 * Determine if a BLE device is a SensorTag CC2541.
-		 * Checks for the CC2541 using the advertised name.
+		 * Determine if a BLE device is a SensorTag CC2605.
+		 * Checks for the CC2605 using the advertised name.
 		 * @instance
 		 * @public
 		 */
